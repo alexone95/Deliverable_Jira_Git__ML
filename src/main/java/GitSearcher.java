@@ -97,6 +97,9 @@ public class GitSearcher {
     public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commit_object, Issue issue) throws IOException, GitAPIException {
         Git git = Git.open(new File(REPO_PATH));
         List<CommitFileDetails> changed_file = new ArrayList<>();
+        int linesAdded = 0;
+        int linesDeleted = 0;
+        int linesReplaced = 0;
 
         DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
         df.setRepository(openJGitRepository());
@@ -110,9 +113,9 @@ public class GitSearcher {
 
         for (DiffEntry diff : diffs) {
             String file_name = diff.getNewPath();
-            int linesAdded = 0;
-            int linesDeleted = 0;
-            int linesReplaced = 0;
+            linesAdded = 0;
+            linesDeleted = 0;
+            linesReplaced = 0;
             if (!file_name.endsWith(FILE_EXTENSION)) {
                 continue;
             }
