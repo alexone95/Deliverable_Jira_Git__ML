@@ -108,7 +108,7 @@ public class Utils {
                 lines++;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            return 0;
         }
         return lines;
 
@@ -244,7 +244,7 @@ public class Utils {
             }
         }
 
-        if ( counterElement == 0 ) {
+        if ( counterElement <= 5 ) {
             throw(new NoVersionException("Non ci sono entry per la versione", testing ));
         }
 
@@ -265,7 +265,7 @@ public class Utils {
                 }
             }
         } catch ( IOException e ) {
-            e.printStackTrace();
+            return 0;
         }
         return numImports;
     }
@@ -279,7 +279,7 @@ public class Utils {
                 }
             }
         } catch ( IOException e ) {
-            e.printStackTrace();
+            return 0;
         }
         return numComments;
     }
