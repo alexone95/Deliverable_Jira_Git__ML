@@ -15,10 +15,6 @@ public class CommitDetails {
     public String commit_date;
     public Issue issue;
 
-    public CommitDetails(){
-
-    }
-
     public List<CommitFileDetails> getFiles_changed() {
         return files_changed;
     }

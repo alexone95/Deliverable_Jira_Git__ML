@@ -13,7 +13,7 @@ import weka.classifiers.lazy.IBk;
 public class Classifier {
     private static final String TRAINING = "_training.arff";
     private static final String TESTING = "_testing.arff";
-    private static final String projName = "STORM";
+    private static final String PROJ_NAME = "STORM";
 
     private Classifier() {
     }
@@ -25,7 +25,7 @@ public class Classifier {
         int limit = 14;
 
         // Open the FileWriter for the output file
-        try (FileWriter csvWriter = new FileWriter("src/output/" + projName+ "_out.csv")) {
+        try (FileWriter csvWriter = new FileWriter("src/output/" + PROJ_NAME + "_out.csv")) {
 
             // Append the first line of the result file
             csvWriter.append("Dataset,# Training,% Training,% Defect Training,%Defect Testing,Classifier,Balancing,FeatureSelection,TP,FP,TN,FN,Precision,Recall,ROC Area,Kappa\n");
@@ -34,11 +34,11 @@ public class Classifier {
             for (int i = 1; i < limit; i++) {
 
                 // Create the ARFF file for the training, till the i-th version
-                resultTraining = Utils.walkForwardTraining(projName, i);
+                resultTraining = Utils.walkForwardTraining(PROJ_NAME, i);
 
                 // Create the ARFF file for testing, with the i+1 version, checking out for Exception
                 try {
-                    resultTesting = Utils.walkForwardTesting(projName, i + 1);
+                    resultTesting = Utils.walkForwardTesting(PROJ_NAME, i + 1);
                 } catch (NoVersionException e) {
                     continue;
                 }
@@ -50,9 +50,9 @@ public class Classifier {
                 double percentageMajorityClass = 1 - ((resultTraining.get(1) + resultTesting.get(1)) / (double) (resultTraining.get(0) + resultTesting.get(0)));
 
                 // Read the Datasource created before and get each dataset
-                DataSource source1 = new DataSource(projName + TRAINING);
+                DataSource source1 = new DataSource(PROJ_NAME + TRAINING);
                 Instances training = source1.getDataSet();
-                DataSource source2 = new DataSource(projName + TESTING);
+                DataSource source2 = new DataSource(PROJ_NAME + TESTING);
                 Instances testing = source2.getDataSet();
 
                 // Get the number of attributes
@@ -79,30 +79,30 @@ public class Classifier {
 
                 // Evaluate each model and add the result to the output file
                 eval.evaluateModel(classifierNB, testing);
-                csvWriter.append(projName + "," + i + ",NaiveBayes," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
+                csvWriter.append(PROJ_NAME + "," + i + ",NaiveBayes," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
 
                 eval.evaluateModel(classifierRF, testing);
-                csvWriter.append(projName + "," + i + ",RandomForest," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
+                csvWriter.append(PROJ_NAME + "," + i + ",RandomForest," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
 
                 eval.evaluateModel(classifierIBk, testing);
-                csvWriter.append(projName + "," + i + ",IBk," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
+                csvWriter.append(PROJ_NAME + "," + i + ",IBk," + eval.precision(0) + "," + eval.recall(0) + "," + eval.areaUnderROC(0) + "," + eval.kappa() + "\n");
 
                 // Apply sampling
                 List<String> samplingResult = Utils.applySampling(training, testing, percentageMajorityClass, "False");
                 for (String result : samplingResult) {
-                    csvWriter.append(projName + "," + i  + "," + percentTraining  + "," + percentDefectTraining  + "," + percentDefectTesting +"," + result);
+                    csvWriter.append(PROJ_NAME + "," + i  + "," + percentTraining  + "," + percentDefectTraining  + "," + percentDefectTesting +"," + result);
                 }
 
                 // Feature selection
                 List<String> featureSelectionResult = Utils.applyFeatureSelection(training, testing, percentageMajorityClass);
                 for (String result : featureSelectionResult) {
-                    csvWriter.append(projName + "," + i  + "," + percentTraining  + "," + percentDefectTraining  + "," + percentDefectTesting +"," + result);
+                    csvWriter.append(PROJ_NAME + "," + i  + "," + percentTraining  + "," + percentDefectTraining  + "," + percentDefectTesting +"," + result);
                 }
             }
 
             // Delete the temp file
-            Files.deleteIfExists(Paths.get(projName + TESTING));
-            Files.deleteIfExists(Paths.get(projName + TRAINING));
+            Files.deleteIfExists(Paths.get(PROJ_NAME + TESTING));
+            Files.deleteIfExists(Paths.get(PROJ_NAME + TRAINING));
             csvWriter.flush();
         }
     }

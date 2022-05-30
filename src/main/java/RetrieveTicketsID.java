@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 public class RetrieveTicketsID {
 
-    public static String projName ="STORM";
+    public static String PROJECT_NAME ="STORM";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
     private static final ArrayList<Issue> list_of_issues_with_AV = new ArrayList<>();
@@ -57,7 +57,7 @@ public class RetrieveTicketsID {
         Integer i;
 
         // Url for the GET request to get information associated to Jira project
-        String url = "https://issues.apache.org/jira/rest/api/2/project/" + projName;
+        String url = "https://issues.apache.org/jira/rest/api/2/project/" + PROJECT_NAME;
 
         JSONObject json = readJsonFromUrl( url );
 
@@ -79,7 +79,7 @@ public class RetrieveTicketsID {
             releaseNumber++;
         }
 
-        datasetBuilder = new DatasetBuilder( version_map , projName );
+        datasetBuilder = new DatasetBuilder( version_map , PROJECT_NAME);
     }
 
     /* This Method takes the JSON Array containing all affected versions specified for the ticket
@@ -112,7 +112,7 @@ public class RetrieveTicketsID {
             // Only gets a max of 1000 at a time, so must do this multiple times if bugs > 1000
 
             j = i + 1000;
-            String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22" + projName
+            String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22" + PROJECT_NAME
                     + "%22AND%22issueType%22=%22Bug%22AND(%22status%22=%22closed%22OR"
                     + "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22&fields=key,versions,resolutiondate,created,fixVersions&startAt="
                     + i.toString() + "&maxResults=1000";
@@ -296,7 +296,7 @@ public class RetrieveTicketsID {
     public static void populateDatasetMapAndWriteToCSV() throws IOException{
         datasetBuilder.populateFileDataset(list_of_issues_with_AV);
         datasetBuilder.populateFileDataset(list_of_issues_without_AV);
-        datasetBuilder.writeToCSV(projName);
+        datasetBuilder.writeToCSV(PROJECT_NAME);
     }
 
 

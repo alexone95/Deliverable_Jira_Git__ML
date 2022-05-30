@@ -113,30 +113,31 @@ public class GitSearcher {
             int linesAdded = 0;
             int linesDeleted = 0;
             int linesReplaced = 0;
-            if (file_name.endsWith(FILE_EXTENSION)){
-                String file_text = getTextfromCommittedFile(commit, file_name);
-
-                int age = getFileAge(commit, file_name);
-
-                for (Edit edit : df.toFileHeader(diff).toEditList()) {
-                    if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-                        linesReplaced += edit.getEndB() - edit.getBeginB();
-                    }
-                    if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB() ){
-                        linesDeleted += edit.getEndA() - edit.getBeginA();
-                    }
-                    if ( edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-                        linesAdded += edit.getEndB() - edit.getBeginB();
-                    }
-                }
-
-                boolean buggy = (commit_object.version < issue.fix_version) && (commit_object.version >= issue.injected_version);
-                int num_imports = Utils.getNumImports(file_text);
-                int num_comments = Utils.getNumComments(file_text);
-
-                changed_file.add(new CommitFileDetails(file_name, linesAdded, linesDeleted, linesReplaced,
-                        Utils.countLineBufferedReader(file_text), file_text, age, buggy, num_imports, num_comments));
+            if (!file_name.endsWith(FILE_EXTENSION)) {
+                continue;
             }
+            String file_text = getTextfromCommittedFile(commit, file_name);
+
+            int age = getFileAge(commit, file_name);
+
+            for (Edit edit : df.toFileHeader(diff).toEditList()) {
+                if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
+                    linesReplaced += edit.getEndB() - edit.getBeginB();
+                }
+                if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB() ){
+                    linesDeleted += edit.getEndA() - edit.getBeginA();
+                }
+                if ( edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
+                    linesAdded += edit.getEndB() - edit.getBeginB();
+                }
+            }
+
+            boolean buggy = (commit_object.version < issue.fix_version) && (commit_object.version >= issue.injected_version);
+            int num_imports = Utils.getNumImports(file_text);
+            int num_comments = Utils.getNumComments(file_text);
+
+            changed_file.add(new CommitFileDetails(file_name, linesAdded, linesDeleted, linesReplaced,
+                    Utils.countLineBufferedReader(file_text), file_text, age, buggy, num_imports, num_comments));
         }
         df.close();
         return changed_file;
