@@ -15,6 +15,9 @@ public class Classifier {
     private static final String TESTING = "_testing.arff";
     private static final String projName = "STORM";
 
+    private Classifier() {
+    }
+
     public static void train() throws Exception{
         List<Integer> resultTesting, resultTraining;
 

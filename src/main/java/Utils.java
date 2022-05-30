@@ -101,8 +101,12 @@ public class Utils {
     public static long countLineBufferedReader(String file_text) {
 
         long lines = 0;
+        String line= "";
         try (BufferedReader reader = new BufferedReader(new StringReader(file_text))) {
-            while (reader.readLine() != null) lines++;
+            while(line != null ){
+                line = reader.readLine();
+                lines++;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -359,15 +363,13 @@ public class Utils {
         // Evaluate with no sampling e no feature selection
         Evaluation eval;
         eval = new Evaluation(training);
+        addResult(applyFilterForSampling(null, eval, training, testing, classifierRF), result, "RF", NO_SAMPLING, featureSelection);
 
-        applyFilterForSampling(null, eval, training, testing, classifierRF);
-        addResult(eval, result, "RF", NO_SAMPLING, featureSelection);
+        eval = new Evaluation(training);
+        addResult(applyFilterForSampling(null, eval, training, testing, classifierIBk), result, "IBk", NO_SAMPLING, featureSelection);
 
-        applyFilterForSampling(null, eval, training, testing, classifierIBk);
-        addResult(eval, result, "IBk", NO_SAMPLING, featureSelection);
-
-        applyFilterForSampling(null, eval, training, testing, classifierNB);
-        addResult(eval, result, "NB", NO_SAMPLING, featureSelection);
+        eval = new Evaluation(training);
+        addResult(applyFilterForSampling(null, eval, training, testing, classifierNB), result, "NB", NO_SAMPLING, featureSelection);
 
         // Apply undersampling
         FilteredClassifier fc = new FilteredClassifier();
@@ -376,16 +378,15 @@ public class Utils {
         String[] opts = new String[]{ "-M", "1.0"};
         underSampling.setOptions(opts);
         fc.setFilter(underSampling);
+
         eval = new Evaluation(training);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", UNDER_SAMPLING, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierRF);
-        addResult(eval, result, "RF", UNDER_SAMPLING, featureSelection);
+        eval = new Evaluation(training);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", UNDER_SAMPLING, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierIBk);
-        addResult(eval, result, "IBk", UNDER_SAMPLING, featureSelection);
-
-        applyFilterForSampling(fc, eval, training, testing, classifierNB);
-        addResult(eval, result, "NB", UNDER_SAMPLING, featureSelection);
+        eval = new Evaluation(training);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", UNDER_SAMPLING, featureSelection);
 
         // Apply oversampling
         fc = new FilteredClassifier();
@@ -396,15 +397,13 @@ public class Utils {
         fc.setFilter(overSampling);
 
         eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", OVER_SAMPLING, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierRF);
-        addResult(eval, result, "RF", OVER_SAMPLING, featureSelection);
+        eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", OVER_SAMPLING, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierIBk);
-        addResult(eval, result, "IBk", OVER_SAMPLING, featureSelection);
-
-        applyFilterForSampling(fc, eval, training, testing, classifierNB);
-        addResult(eval, result, "NB", OVER_SAMPLING, featureSelection);
+        eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", OVER_SAMPLING, featureSelection);
 
         // Apply SMOTE
         weka.filters.supervised.instance.SMOTE smote = new SMOTE();
@@ -414,15 +413,13 @@ public class Utils {
 
         // Evaluate the three classifiers
         eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", SMOTE, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierRF);
-        addResult(eval, result, "RF", SMOTE, featureSelection);
+        eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", SMOTE, featureSelection);
 
-        applyFilterForSampling(fc, eval, training, testing, classifierIBk);
-        addResult(eval, result, "IBk", SMOTE, featureSelection);
-
-        applyFilterForSampling(fc, eval, training, testing, classifierNB);
-        addResult(eval, result, "NB", SMOTE, featureSelection);
+        eval = new Evaluation(testing);
+        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", SMOTE, featureSelection);
 
         return result;
 
