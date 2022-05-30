@@ -30,12 +30,12 @@ public class Utils {
 
     public static void print_files_infoprint_files_info(List<CommitFileDetails> commitFileDetailsList){
         for(CommitFileDetails commitFileDetails : commitFileDetailsList){
-            System.out.println("_______________________________________________________________________________________");
+            System.out.println("\n");
             System.out.println("FILE NAME: " + commitFileDetails.modified_file_name);
             System.out.println("DELETED LOC: " + commitFileDetails.deleted_LOC + "| LOC: " + commitFileDetails.LOC +
                     "| ADDED LOC: " + commitFileDetails.added_LOC + "| AGE: " + commitFileDetails.age);
             System.out.println("BUGGY: " + commitFileDetails.buggy);
-            System.out.println("_______________________________________________________________________________________\n");
+            System.out.println("\n");
         }
     }
 
@@ -59,7 +59,7 @@ public class Utils {
 
     public static void print_commit_details_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("<----------------------------------------------------------------------------------->");
+            System.out.println("\n");
             System.out.println("KEY: " + commitIssue.issue_key );
             for(CommitDetails commitDetails : commitIssue.commits){
                 System.out.println("COMMIT HASH: " + commitDetails.commit.getName());
@@ -73,7 +73,7 @@ public class Utils {
 
     public static void print_full_info_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("<----------------------------------------------------------------------------------->");
+            System.out.println("\n");
             System.out.println("KEY: " + commitIssue.issue_key );
             System.out.println("RESOLUTION DATE: " + commitIssue.resolutionDate + "| CREATION DATE: " + commitIssue.creationDate );
             System.out.println("AV: " + commitIssue.affected_version.toString()  + "AV INDEX: " + commitIssue.affected_version_index.toString() + "\n");
@@ -89,7 +89,7 @@ public class Utils {
 
     public static void print_file_details_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("<----------------------------------------------------------------------------------->");
+            System.out.println("\n");
             System.out.println("KEY: " + commitIssue.issue_key );
             for(CommitDetails commitDetails : commitIssue.commits){
                 System.out.println("COMMIT HASH: " + commitDetails.commit.getName() + "\n");
