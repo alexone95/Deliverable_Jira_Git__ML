@@ -130,12 +130,12 @@ public class DatasetBuilder {
 
             // The following Tree Map is used to insert dataset entries in the csv following the correct order (by version).
             Map<String, Metrics> orderedMap = new TreeMap<>();
-            MapIterator dataSetIterator = fileDataset.mapIterator();
+            var dataSetIterator = fileDataset.mapIterator();
 
             // Iterate over the dataset
             while ( dataSetIterator.hasNext() ) {
                 dataSetIterator.next();
-                MultiKey key = (MultiKey) dataSetIterator.getKey();
+                var key = (MultiKey) dataSetIterator.getKey();
 
                 int version = (int) key.getKey(0);
                 if ( version <= lastVersion + 1 ){
