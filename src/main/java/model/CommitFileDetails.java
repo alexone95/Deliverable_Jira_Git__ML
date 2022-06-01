@@ -1,3 +1,5 @@
+package model;
+
 public class CommitFileDetails {
     public String modified_file_name;
     public int added_LOC;

@@ -1,11 +1,14 @@
+import classifier.Classifier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MultimapBuilder;
 import me.tongfei.progressbar.ProgressBar;
+import model.Issue;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.common.collect.Multimap;
+import utils.Utils;
 
 import java.io.*;
 import java.net.URL;

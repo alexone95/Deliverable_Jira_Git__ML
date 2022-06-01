@@ -1,3 +1,5 @@
+package utils;
+
 import java.lang.Exception;
 
 public class NoVersionException extends Exception {

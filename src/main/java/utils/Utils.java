@@ -1,3 +1,5 @@
+package utils;
+
 import weka.attributeSelection.CfsSubsetEval;
 import weka.attributeSelection.GreedyStepwise;
 import weka.classifiers.AbstractClassifier;
@@ -16,7 +18,7 @@ import weka.filters.supervised.instance.SpreadSubsample;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
+import model.*;
 
 public class Utils {
 

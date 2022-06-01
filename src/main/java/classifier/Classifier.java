@@ -1,14 +1,17 @@
+package classifier;
+
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.RandomForest;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-
-import weka.core.Instances;
-import weka.classifiers.Evaluation;
-import weka.classifiers.trees.RandomForest;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.core.converters.ConverterUtils.DataSource;
-import weka.classifiers.lazy.IBk;
+import utils.*;
 
 public class Classifier {
     private static final String TRAINING = "_training.arff";
@@ -19,7 +22,8 @@ public class Classifier {
     }
 
     public static void train() throws Exception{
-        List<Integer> resultTesting, resultTraining;
+        List<Integer> resultTesting;
+        List<Integer> resultTraining;
 
         // Declare the number of revision for each dataset
         int limit = 14;
@@ -28,7 +32,7 @@ public class Classifier {
         try (FileWriter csvWriter = new FileWriter("src/output/" + PROJ_NAME + "_out.csv")) {
 
             // Append the first line of the result file
-            csvWriter.append("Dataset,# Training,% Training,% Defect Training,%Defect Testing,Classifier,Balancing,FeatureSelection,TP,FP,TN,FN,Precision,Recall,ROC Area,Kappa\n");
+            csvWriter.append("Dataset,# Training,% Training,% Defect Training,%Defect Testing,classifier.Classifier,Balancing,FeatureSelection,TP,FP,TN,FN,Precision,Recall,ROC Area,Kappa\n");
 
             // Iterate over the single version for the WalkForward technique...
             for (int i = 1; i < limit; i++) {

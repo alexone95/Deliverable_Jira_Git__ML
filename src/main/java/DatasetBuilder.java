@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.google.common.collect.Multimap;
+import model.CommitDetails;
+import model.CommitFileDetails;
+import model.Issue;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.LinkedMap;
