@@ -151,25 +151,24 @@ public class DatasetBuilder {
 
                 Metrics metrics = entry.getValue();
                 // Check that the version index is contained in the first half of the releases
-                    int nr =                metrics.getNR();
-                    String NR =             Integer.toString((metrics.getNR()));
-                    String NAUTH =          Integer.toString(metrics.getAUTHORS().size());
-                    String LOC =            Integer.toString((int)metrics.getLOC()/nr);
-                    String AGE =            Integer.toString(metrics.getAGE());
-                    String CHURN =          Integer.toString(metrics.getCHURN());
-                    String LOC_TOUCHED = 	Integer.toString(metrics.getLOC_TOUCHED());
-                    String AvgLocAdded =    Integer.toString((int) ( metrics.getAVG_LOC_ADDED()/nr ) );
-                    String MaxLocAdded =    Integer.toString(metrics.getMAX_LOC_ADDED());
-                    String AvgChgSet =      Integer.toString((int)metrics.getAVG_CHANGE_SET()/nr);
-                    String MaxChgSet =      Integer.toString(metrics.getMAX_CHANGE_SET());
-                    String numImports = 	Integer.toString(metrics.getNumImports());
-                    String numComments = 	Integer.toString(metrics.getNumComments());
-                    String buggy =          metrics.getBUGGYNESS().equals("true") ? "Yes" : "No";
+                    int nr = metrics.getNR();
+                    String nAuth = Integer.toString(metrics.getAUTHORS().size());
+                    String loc = Integer.toString(metrics.getLOC()/nr);
+                    String age = Integer.toString(metrics.getAGE());
+                    String churn = Integer.toString(metrics.getCHURN());
+                    String locTouched = Integer.toString(metrics.getLOC_TOUCHED());
+                    String avgLocAdded = Integer.toString( ( metrics.getAVG_LOC_ADDED()/nr ) );
+                    String maxLocAdded = Integer.toString(metrics.getMAX_LOC_ADDED());
+                    String avgChgSet = Integer.toString(metrics.getAVG_CHANGE_SET()/nr);
+                    String maxChgSet = Integer.toString(metrics.getMAX_CHANGE_SET());
+                    String numImports = Integer.toString(metrics.getNumImports());
+                    String numComments = Integer.toString(metrics.getNumComments());
+                    String buggy = metrics.getBUGGYNESS().equals("true") ? "Yes" : "No";
 
                     // Append the data
-                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metrics.getNR() + "," + NAUTH + ","
-                            + LOC + "," + AGE + "," + CHURN + ","+ LOC_TOUCHED + "," + AvgLocAdded + "," +  MaxLocAdded + ","
-                            + AvgChgSet + "," + MaxChgSet + ","  + numImports + ","  + numComments + "," +  buggy);
+                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metrics.getNR() + "," + nAuth + ","
+                            + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
+                            + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numComments + "," +  buggy);
 
                     csvWriter.append("\n");
 
