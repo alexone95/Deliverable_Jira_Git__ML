@@ -36,22 +36,22 @@ public class GitSearcher {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String repoPath = "C:/Users/daniele/IdeaProjects/storm/.git";
-    public static final String fileExtension = ".java";
+    public static final String REPOPATH = "C:/Users/daniele/IdeaProjects/storm/.git";
+    public static final String FILEEXTENSION = ".java";
 
-    public static int getFileAge(RevCommit start_commit, String filename ) throws IOException {
+    public static int getFileAge(RevCommit startCommit, String filename ) throws IOException {
         Date dateFirstCommit;
         Date dateCurrentCommit;
         int age;
         try (Repository repository = openJGitRepository()) {
             RevWalk revWalk = new RevWalk( repository );
-            revWalk.markStart( revWalk.parseCommit( repository.resolve( start_commit.getName() ) ) );
+            revWalk.markStart( revWalk.parseCommit( repository.resolve( startCommit.getName() ) ) );
             revWalk.setTreeFilter( PathFilter.create( filename ) );
             revWalk.sort( RevSort.COMMIT_TIME_DESC );
             revWalk.sort( RevSort.REVERSE, true );
             RevCommit commit = revWalk.next();
             dateFirstCommit = commit.getAuthorIdent().getWhen();
-            dateCurrentCommit = start_commit.getAuthorIdent().getWhen();
+            dateCurrentCommit = startCommit.getAuthorIdent().getWhen();
 
             long diffInMillies = Math.abs(dateCurrentCommit.getTime() - dateFirstCommit.getTime());
             long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
@@ -62,20 +62,20 @@ public class GitSearcher {
 
     public static Repository openJGitRepository() throws IOException{
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        return builder.setGitDir(new File(repoPath))
+        return builder.setGitDir(new File(REPOPATH))
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
                 .build();
     }
 
-    public static List<CommitDetails> getAllCommitDetails(Repository repository, String filter_param, Issue issue)
+    public static List<CommitDetails> getAllCommitDetails(Repository repository, String filterParam, Issue issue)
             throws IOException, GitAPIException {
         Collection<Ref> allRefs = repository.getAllRefs().values();
         List<CommitDetails> listOfCommits = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         try (RevWalk revWalk = new RevWalk( repository )) {
-            revWalk.setRevFilter(MessageRevFilter.create(filter_param));
+            revWalk.setRevFilter(MessageRevFilter.create(filterParam));
 
             for( Ref ref : allRefs ) {
                 revWalk.markStart( revWalk.parseCommit( ref.getObjectId() ));
@@ -105,7 +105,7 @@ public class GitSearcher {
 
 
     public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
-        Git git = Git.open(new File(repoPath));
+        Git git = Git.open(new File(REPOPATH));
         List<CommitFileDetails> changedFilesList = new ArrayList<>();
         int linesAdded = 0;
         int linesDeleted = 0;
@@ -126,7 +126,7 @@ public class GitSearcher {
             linesAdded = 0;
             linesDeleted = 0;
             linesReplaced = 0;
-            if (!fileName.endsWith(fileExtension)) {
+            if (!fileName.endsWith(FILEEXTENSION)) {
                 continue;
             }
             String fileText = getTextfromCommittedFile(commit, fileName);

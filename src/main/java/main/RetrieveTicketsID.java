@@ -25,16 +25,16 @@ import java.util.stream.IntStream;
 
 public class RetrieveTicketsID {
 
-    public static String PROJECT_NAME ="STORM";
+    public static final String PROJECT_NAME ="STORM";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
     private static final ArrayList<Issue> list_of_issues_with_AV = new ArrayList<>();
     private static final ArrayList<Issue> list_of_issues_without_AV = new ArrayList<>();
 
-    public static double p;
+    private static double p;
     public static final String RELEASE_DATE = "releaseDate";
 
-    public static DatasetBuilder datasetBuilder;
+    private static DatasetBuilder datasetBuilder;
 
     private static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -91,12 +91,12 @@ public class RetrieveTicketsID {
 
     /* This Method takes the JSON Array containing all affected versions specified for the ticket
     and returns a String ArrayList containing only those having an associated release date. */
-    public static ArrayList<String> getJsonAffectedVersionList(JSONArray AVarray) throws JSONException {
+    public static ArrayList<String> getJsonAffectedVersionList(JSONArray avArray) throws JSONException {
         ArrayList<String> affectedVersions = new ArrayList<>();
-        if ( AVarray.length() > 0 ) {
+        if ( avArray.length() > 0 ) {
             // For each release in the AV version
-            for (int k = 0; k < AVarray.length(); k++) {
-                JSONObject singleRelease = AVarray.getJSONObject(k);
+            for (int k = 0; k < avArray.length(); k++) {
+                JSONObject singleRelease = avArray.getJSONObject(k);
                 // Check if the single release has been released
                 if ( singleRelease.has( RELEASE_DATE ) ) {
                     affectedVersions.add(singleRelease.getString("name"));
@@ -127,11 +127,9 @@ public class RetrieveTicketsID {
             JSONObject json = readJsonFromUrl(url);
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
-            //total = 300;
 
-            // For each closed ticket...
+            // For each closed ticket get the key of the ticket
             for (; i < total && i < j; i++) {
-                // ... get the key of the ticket,
 
                 String key = ( issues.getJSONObject(i % 1000).get("key").toString() ).split("-")[1];
 
@@ -141,13 +139,13 @@ public class RetrieveTicketsID {
 
                 String creationDate = currentIssue.getString("created").split("T")[0];
 
-                // , get JSONArray associated to the affected versions.
-                JSONArray AVarray = currentIssue.getJSONArray("versions");
+                // get JSONArray associated to the affected versions.
+                JSONArray avArray = currentIssue.getJSONArray("versions");
 
-                // Get a Java List from the JSONArray with only dated affected versions.
-                ArrayList<String> AVlist = getJsonAffectedVersionList( AVarray );
+                // Get a List from the JSONArray with only dated affected versions.
+                ArrayList<String> avList = getJsonAffectedVersionList( avArray );
 
-                Issue issue = new Issue( key, resolutionDate, creationDate, AVlist );
+                Issue issue = new Issue( key, resolutionDate, creationDate, avList );
 
                 list_of_issues.add(issue);
 
@@ -156,7 +154,7 @@ public class RetrieveTicketsID {
 
     }
 
-    public static void getCommits() throws IOException, JSONException, GitAPIException, ParseException {
+    public static void getCommits() throws IOException, JSONException, GitAPIException {
         ProgressBar pb = new ProgressBar("SCANNING TICKET", list_of_issues.size()); // name, initial max
         pb.start();
         for(Issue issue : list_of_issues){
@@ -206,7 +204,7 @@ public class RetrieveTicketsID {
         for ( Issue issue : list_of_issues ){
             // If the current issue has not specified AVs it'll be appended to the array
             // that will be used to perform the Proportion Method.
-            if ( issue.getAffected_version().size() == 0 ){
+            if ( issue.getAffected_version().isEmpty() ){
                 list_of_issues_without_AV.add( issue );
             }
             else{
@@ -266,11 +264,11 @@ public class RetrieveTicketsID {
         for ( Issue issue : issues ){
             int fv = issue.fix_version;
             int ov = issue.opening_version;
-            int P = (int) p;
+            int pInt = (int) p;
             if ( fv == ov ) {
-                issue.injected_version = (fv - (P));
+                issue.injected_version = (fv - (pInt));
             } else{
-                issue.injected_version = (fv - (( fv - ov ) * P )) ;
+                issue.injected_version = (fv - (( fv - ov ) * pInt )) ;
             }
             int minAVValue = issue.injected_version;
             int maxAVValue = issue.fix_version - 1;
@@ -280,9 +278,7 @@ public class RetrieveTicketsID {
 
     /* This Method is used to clean the issues array from all issue tickets that have no related commits. */
     public static void removeIssuesWithoutCommits(){
-        System.out.println(list_of_issues.size());
         list_of_issues.removeIf( issue -> issue.getCommits().isEmpty() );
-        System.out.println(list_of_issues.size());
     }
 
 
