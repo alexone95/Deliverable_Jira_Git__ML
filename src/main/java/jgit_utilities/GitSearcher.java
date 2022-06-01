@@ -1,4 +1,4 @@
-package jgitUtilities;
+package jgit_utilities;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,12 +32,16 @@ import main.RetrieveTicketsID;
 
 public class GitSearcher {
 
-    public static String REPO_PATH = "C:/Users/daniele/IdeaProjects/storm/.git";
-    public static final String FILE_EXTENSION = ".java";
+    private GitSearcher() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static final String repoPath = "C:/Users/daniele/IdeaProjects/storm/.git";
+    public static final String fileExtension = ".java";
 
     public static int getFileAge(RevCommit start_commit, String filename ) throws IOException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date date_first_commit, date_current_commit;
+        Date dateFirstCommit;
+        Date dateCurrentCommit;
         int age;
         try (Repository repository = openJGitRepository()) {
             RevWalk revWalk = new RevWalk( repository );
@@ -46,19 +50,19 @@ public class GitSearcher {
             revWalk.sort( RevSort.COMMIT_TIME_DESC );
             revWalk.sort( RevSort.REVERSE, true );
             RevCommit commit = revWalk.next();
-            date_first_commit = commit.getAuthorIdent().getWhen();
-            date_current_commit = start_commit.getAuthorIdent().getWhen();
+            dateFirstCommit = commit.getAuthorIdent().getWhen();
+            dateCurrentCommit = start_commit.getAuthorIdent().getWhen();
 
-            long diffInMillies = Math.abs(date_current_commit.getTime() - date_first_commit.getTime());
-            long diff_in_days = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            age = (int) (diff_in_days/7);
+            long diffInMillies = Math.abs(dateCurrentCommit.getTime() - dateFirstCommit.getTime());
+            long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            age = (int) (diffInDays/7);
         }
         return age;
     }
 
     public static Repository openJGitRepository() throws IOException{
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        return builder.setGitDir(new File(REPO_PATH))
+        return builder.setGitDir(new File(repoPath))
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
                 .build();
@@ -67,7 +71,7 @@ public class GitSearcher {
     public static List<CommitDetails> getAllCommitDetails(Repository repository, String filter_param, Issue issue)
             throws IOException, GitAPIException {
         Collection<Ref> allRefs = repository.getAllRefs().values();
-        List<CommitDetails> list_of_commits = new ArrayList<>();
+        List<CommitDetails> listOfCommits = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         try (RevWalk revWalk = new RevWalk( repository )) {
@@ -81,28 +85,28 @@ public class GitSearcher {
                 LocalDate commitLocalDate = commit.getCommitterIdent().getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 int version = RetrieveTicketsID.getVersionFromLocalDate( commitLocalDate );
                 if ( issue.fix_version >= version ) {
-                    CommitDetails commit_details = new CommitDetails();
-                    commit_details.setCommit(commit);
-                    commit_details.version = version;
-                    commit_details.setFiles_changed(commitChanges(commit, commit_details, issue));
-                    commit_details.setPerson(commit.getAuthorIdent());
-                    commit_details.setAdded_loc();
-                    commit_details.setDeleted_loc();
-                    commit_details.full_message = commit.getFullMessage();
-                    commit_details.commit_date = formatter.format(commit_details.getPerson().getWhen());
+                    CommitDetails commitDetail = new CommitDetails();
+                    commitDetail.setCommit(commit);
+                    commitDetail.version = version;
+                    commitDetail.setFiles_changed(commitChanges(commit, commitDetail, issue));
+                    commitDetail.setPerson(commit.getAuthorIdent());
+                    commitDetail.setAdded_loc();
+                    commitDetail.setDeleted_loc();
+                    commitDetail.full_message = commit.getFullMessage();
+                    commitDetail.commit_date = formatter.format(commitDetail.getPerson().getWhen());
 
 
-                    list_of_commits.add(commit_details);
+                    listOfCommits.add(commitDetail);
                 }
             }
         }
-        return list_of_commits;
+        return listOfCommits;
     }
 
 
-    public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commit_object, Issue issue) throws IOException, GitAPIException {
-        Git git = Git.open(new File(REPO_PATH));
-        List<CommitFileDetails> changed_file = new ArrayList<>();
+    public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
+        Git git = Git.open(new File(repoPath));
+        List<CommitFileDetails> changedFilesList = new ArrayList<>();
         int linesAdded = 0;
         int linesDeleted = 0;
         int linesReplaced = 0;
@@ -118,16 +122,16 @@ public class GitSearcher {
                 .call();
 
         for (DiffEntry diff : diffs) {
-            String file_name = diff.getNewPath();
+            String fileName = diff.getNewPath();
             linesAdded = 0;
             linesDeleted = 0;
             linesReplaced = 0;
-            if (!file_name.endsWith(FILE_EXTENSION)) {
+            if (!fileName.endsWith(fileExtension)) {
                 continue;
             }
-            String file_text = getTextfromCommittedFile(commit, file_name);
+            String fileText = getTextfromCommittedFile(commit, fileName);
 
-            int age = getFileAge(commit, file_name);
+            int age = getFileAge(commit, fileName);
 
             for (Edit edit : df.toFileHeader(diff).toEditList()) {
                 if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
@@ -141,15 +145,15 @@ public class GitSearcher {
                 }
             }
 
-            boolean buggy = (commit_object.version < issue.fix_version) && (commit_object.version >= issue.injected_version);
-            int num_imports = Utils.getNumImports(file_text);
-            int num_comments = Utils.getNumComments(file_text);
+            boolean buggy = (commitObject.version < issue.fix_version) && (commitObject.version >= issue.injected_version);
+            int numImports = Utils.getNumImports(fileText);
+            int numComments = Utils.getNumComments(fileText);
 
-            changed_file.add(new CommitFileDetails(file_name, linesAdded, linesDeleted, linesReplaced,
-                    Utils.countLineBufferedReader(file_text), file_text, age, buggy, num_imports, num_comments));
+            changedFilesList.add(new CommitFileDetails(fileName, linesAdded, linesDeleted, linesReplaced,
+                    Utils.countLineBufferedReader(fileText), fileText, age, buggy, numImports, numComments));
         }
         df.close();
-        return changed_file;
+        return changedFilesList;
     }
 
     private static AbstractTreeIterator prepareTreeParser(Repository repository, String objectId) throws IOException {
@@ -171,7 +175,7 @@ public class GitSearcher {
     public static String getTextfromCommittedFile(RevCommit commit, String filename) throws IOException {
         RevTree tree = commit.getTree();
         Repository repository = openJGitRepository();
-        String file_text;
+        String fileText;
 
         // now try to find a specific file
         try (TreeWalk treeWalk = new TreeWalk(repository)) {
@@ -187,8 +191,8 @@ public class GitSearcher {
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             loader.copyTo(stream);
-            file_text = stream.toString();
-            return file_text;
+            fileText = stream.toString();
+            return fileText;
 
         }
     }
