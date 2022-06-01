@@ -1,6 +1,9 @@
+package main;
+
 import classifier.Classifier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MultimapBuilder;
+import jgitUtilities.GitSearcher;
 import me.tongfei.progressbar.ProgressBar;
 import metrics.DatasetBuilder;
 import model.Issue;

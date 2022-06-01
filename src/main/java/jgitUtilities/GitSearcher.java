@@ -1,3 +1,4 @@
+package jgitUtilities;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,6 +28,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import utils.Utils;
+import main.RetrieveTicketsID;
 
 public class GitSearcher {
 
