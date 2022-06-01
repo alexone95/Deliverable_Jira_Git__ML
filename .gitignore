@@ -1,3 +1,4 @@
 # Project exclude paths
 /target/
-/output/
+/src/output/
+/src/csv_output/

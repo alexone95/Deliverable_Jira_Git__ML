@@ -1,3 +1,5 @@
+package metrics;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -76,7 +78,7 @@ public class DatasetBuilder {
         try (FileWriter csvWriter = new FileWriter("src/csv_output/" + projectName + "_dataset.csv")) {
 
             /*
-             * Metrics Data Structure
+             * metrics.Metrics Data Structure
              *   (version)
              *   (filepath)
              *  0 - NumberRevisions

@@ -2,6 +2,7 @@ import classifier.Classifier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MultimapBuilder;
 import me.tongfei.progressbar.ProgressBar;
+import metrics.DatasetBuilder;
 import model.Issue;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONArray;
@@ -304,7 +305,7 @@ public class RetrieveTicketsID {
 
 
     public static void main(String[] args) throws Exception {
-        boolean train = false;
+        boolean train = true;
 
         if (train) {
             getVersionsWithReleaseDate();
