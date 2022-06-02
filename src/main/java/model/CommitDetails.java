@@ -10,12 +10,12 @@ public class CommitDetails {
     private PersonIdent person;
     private List<CommitFileDetails> filesChanged = new ArrayList<>();
     private RevCommit commit;
-    public String fullMessage;
-    public int addedLoc;
-    public int deletedLoc;
-    public int version;
-    public String commitDate;
-    public Issue issue;
+    private String fullMessage;
+    private int addedLoc;
+    private int deletedLoc;
+    private int version;
+    private String commitDate;
+    private Issue issue;
 
     public List<CommitFileDetails> getFilesChanged() {
         return filesChanged;
@@ -61,5 +61,35 @@ public class CommitDetails {
         }
     }
 
+    public String getFullMessage() {
+        return fullMessage;
+    }
 
+    public void setFullMessage(String fullMessage) {
+        this.fullMessage = fullMessage;
+    }
+
+    public void setAddedLoc(int addedLoc) {
+        this.addedLoc = addedLoc;
+    }
+
+    public void setDeletedLoc(int deletedLoc) {
+        this.deletedLoc = deletedLoc;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public String getCommitDate() {
+        return commitDate;
+    }
+
+    public void setCommitDate(String commitDate) {
+        this.commitDate = commitDate;
+    }
 }

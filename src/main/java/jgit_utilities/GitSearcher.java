@@ -87,14 +87,13 @@ public class GitSearcher {
                 if ( issue.fix_version >= version ) {
                     CommitDetails commitDetail = new CommitDetails();
                     commitDetail.setCommit(commit);
-                    commitDetail.version = version;
+                    commitDetail.setVersion(version);
                     commitDetail.setFilesChanged(commitChanges(commit, commitDetail, issue));
                     commitDetail.setPerson(commit.getAuthorIdent());
                     commitDetail.setAdded_loc();
                     commitDetail.setDeleted_loc();
-                    commitDetail.fullMessage = commit.getFullMessage();
-                    commitDetail.commitDate = formatter.format(commitDetail.getPerson().getWhen());
-
+                    commitDetail.setFullMessage(commit.getFullMessage());
+                    commitDetail.setCommitDate(formatter.format(commitDetail.getPerson().getWhen()));
 
                     listOfCommits.add(commitDetail);
                 }
@@ -145,7 +144,7 @@ public class GitSearcher {
                 }
             }
 
-            boolean buggy = (commitObject.version < issue.fix_version) && (commitObject.version >= issue.injected_version);
+            boolean buggy = (commitObject.getVersion() < issue.fix_version) && (commitObject.getVersion() >= issue.injected_version);
             int numImports = Utils.getNumImports(fileText);
             int numComments = Utils.getNumComments(fileText);
 

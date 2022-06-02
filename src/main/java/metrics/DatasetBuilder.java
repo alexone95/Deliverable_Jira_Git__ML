@@ -39,7 +39,7 @@ public class DatasetBuilder {
             for ( CommitDetails commit : issue.getCommits() ){
                 for ( CommitFileDetails file : commit.getFilesChanged() ){
                     Metrics newMetrics = new Metrics();
-                    version = commit.version;
+                    version = commit.getVersion();
                     filepath = file.modified_file_name;
                     newMetrics.setVersion(version);
                     newMetrics.setFilepath(filepath);

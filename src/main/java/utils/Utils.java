@@ -65,10 +65,10 @@ public class Utils {
             System.out.println("KEY: " + commitIssue.issue_key );
             for(CommitDetails commitDetails : commitIssue.commits){
                 System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName());
-                System.out.println("ADDED LOC: " + commitDetails.addedLoc);
-                System.out.println("DELETED LOC: " + commitDetails.deletedLoc);
+                System.out.println("ADDED LOC: " + commitDetails.getAddedLoc());
+                System.out.println("DELETED LOC: " + commitDetails.getDeletedLoc());
                 System.out.println("PERSON: " + commitDetails.getPerson().getName());
-                System.out.println("COMMIT DATE: " + commitDetails.commitDate);
+                System.out.println("COMMIT DATE: " + commitDetails.getCommitDate());
             }
         }
     }
@@ -81,7 +81,7 @@ public class Utils {
             System.out.println("AV: " + commitIssue.affected_version.toString()  + "AV INDEX: " + commitIssue.affected_version_index.toString() + "\n");
             for(CommitDetails commitDetails : commitIssue.commits){
                 System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName() + "| COMMIT DATE: "
-                        + commitDetails.commitDate + "| VERSION: " + commitDetails.version + "| PERSON:" +
+                        + commitDetails.getCommitDate() + "| VERSION: " + commitDetails.getVersion() + "| PERSON:" +
                         commitDetails.getPerson().getName());
                 print_files_infoprint_files_info(commitDetails.getFilesChanged());
                 System.out.println("\n");
