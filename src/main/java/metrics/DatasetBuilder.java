@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.google.common.collect.Multimap;
-import model.CommitDetails;
-import model.CommitFileDetails;
-import model.Issue;
+import model.*;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -22,7 +20,7 @@ public class DatasetBuilder {
 
     private Multimap<LocalDate,String> versionMap;
 
-    private int lastVersion;
+    private final int lastVersion;
 
     private String projectName;
 
@@ -39,7 +37,7 @@ public class DatasetBuilder {
         String  filepath;
         for ( Issue issue : issues ){
             for ( CommitDetails commit : issue.getCommits() ){
-                for ( CommitFileDetails file : commit.getFiles_changed() ){
+                for ( CommitFileDetails file : commit.getFilesChanged() ){
                     Metrics newMetrics = new Metrics();
                     version = commit.version;
                     filepath = file.modified_file_name;
@@ -48,13 +46,13 @@ public class DatasetBuilder {
                     newMetrics.setNr( 1 );
                     newMetrics.setAge( file.age);
                     newMetrics.setChurn(file.churn);
-                    newMetrics.appendAuthor(commit.person.getName());
+                    newMetrics.appendAuthor(commit.getPerson().getName());
                     newMetrics.setLocTouched(file.LOC_touched);
                     newMetrics.setMaxLocAdded(file.added_LOC);
                     newMetrics.setLoc((int) file.LOC);
                     newMetrics.setAvgLocAdded(file.added_LOC);
-                    newMetrics.setAvgChangeSet(commit.files_changed.size());
-                    newMetrics.setMaxChangeSet(commit.files_changed.size());
+                    newMetrics.setAvgChangeSet(commit.getFilesChanged().size());
+                    newMetrics.setMaxChangeSet(commit.getFilesChanged().size());
                     newMetrics.setNumImports(file.numImports);
                     newMetrics.setNumComments(file.numComments);
                     newMetrics.setBuggyness(String.valueOf(file.buggy));
