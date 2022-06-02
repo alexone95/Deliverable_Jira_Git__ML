@@ -165,13 +165,13 @@ public class Metrics {
         // Sum up all loc reported for this file over all commits within the release.
         this.loc += oldMetrics.getLoc();
         // Update MAX loc ADDED only if it is greater than the max loc added reached by previous commits within the release.
-        if (!( this.maxLocAdded > oldMetrics.getMaxLocAdded())){
+        if ( this.maxLocAdded <= oldMetrics.getMaxLocAdded()){
             this.maxLocAdded = oldMetrics.getMaxLocAdded();
         }
         // Sum up all CHANGE SET SIZE over commits within the release.
         this.avgChangeSet += oldMetrics.getAvgChangeSet();
         // Update MAX CHANGE SET only if it is greater than the max chg set reached by previous commits within the release.
-        if (!( this.maxChangeSet > oldMetrics.getMaxChangeSet())){
+        if (this.maxChangeSet <= oldMetrics.getMaxChangeSet()){
             this.maxChangeSet = oldMetrics.getMaxChangeSet();
         }
         // Sum up all loc reported for this file over all commits within the release.
