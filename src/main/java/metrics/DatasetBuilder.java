@@ -11,7 +11,6 @@ import com.google.common.collect.Multimap;
 import model.CommitDetails;
 import model.CommitFileDetails;
 import model.Issue;
-import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -46,19 +45,19 @@ public class DatasetBuilder {
                     filepath = file.modified_file_name;
                     newMetrics.setVersion(version);
                     newMetrics.setFilepath(filepath);
-                    newMetrics.setNR( 1 );
-                    newMetrics.setAGE( file.age);
-                    newMetrics.setCHURN(file.churn);
+                    newMetrics.setNr( 1 );
+                    newMetrics.setAge( file.age);
+                    newMetrics.setChurn(file.churn);
                     newMetrics.appendAuthor(commit.person.getName());
-                    newMetrics.setLOC_TOUCHED(file.LOC_touched);
-                    newMetrics.setMAX_LOC_ADDED(file.added_LOC);
-                    newMetrics.setLOC((int) file.LOC);
-                    newMetrics.setAVG_LOC_ADDED(file.added_LOC);
-                    newMetrics.setAVG_CHANGE_SET(commit.files_changed.size());
-                    newMetrics.setMAX_CHANGE_SET(commit.files_changed.size());
+                    newMetrics.setLocTouched(file.LOC_touched);
+                    newMetrics.setMaxLocAdded(file.added_LOC);
+                    newMetrics.setLoc((int) file.LOC);
+                    newMetrics.setAvgLocAdded(file.added_LOC);
+                    newMetrics.setAvgChangeSet(commit.files_changed.size());
+                    newMetrics.setMaxChangeSet(commit.files_changed.size());
                     newMetrics.setNumImports(file.numImports);
                     newMetrics.setNumComments(file.numComments);
-                    newMetrics.setBUGGYNESS(String.valueOf(file.buggy));
+                    newMetrics.setBuggyness(String.valueOf(file.buggy));
                     if( !fileDataset.containsKey(version,filepath) ){
                         fileDataset.put( version, filepath, newMetrics );
                     } else{
@@ -151,22 +150,22 @@ public class DatasetBuilder {
 
                 Metrics metrics = entry.getValue();
                 // Check that the version index is contained in the first half of the releases
-                    int nr = metrics.getNR();
-                    String nAuth = Integer.toString(metrics.getAUTHORS().size());
-                    String loc = Integer.toString(metrics.getLOC()/nr);
-                    String age = Integer.toString(metrics.getAGE());
-                    String churn = Integer.toString(metrics.getCHURN());
-                    String locTouched = Integer.toString(metrics.getLOC_TOUCHED());
-                    String avgLocAdded = Integer.toString( ( metrics.getAVG_LOC_ADDED()/nr ) );
-                    String maxLocAdded = Integer.toString(metrics.getMAX_LOC_ADDED());
-                    String avgChgSet = Integer.toString(metrics.getAVG_CHANGE_SET()/nr);
-                    String maxChgSet = Integer.toString(metrics.getMAX_CHANGE_SET());
+                    int nr = metrics.getNr();
+                    String nAuth = Integer.toString(metrics.getAuthors().size());
+                    String loc = Integer.toString(metrics.getLoc()/nr);
+                    String age = Integer.toString(metrics.getAge());
+                    String churn = Integer.toString(metrics.getChurn());
+                    String locTouched = Integer.toString(metrics.getLocTouched());
+                    String avgLocAdded = Integer.toString( ( metrics.getAvgLocAdded()/nr ) );
+                    String maxLocAdded = Integer.toString(metrics.getMaxLocAdded());
+                    String avgChgSet = Integer.toString(metrics.getAvgChangeSet()/nr);
+                    String maxChgSet = Integer.toString(metrics.getMaxChangeSet());
                     String numImports = Integer.toString(metrics.getNumImports());
                     String numComments = Integer.toString(metrics.getNumComments());
-                    String buggy = metrics.getBUGGYNESS().equals("true") ? "Yes" : "No";
+                    String buggy = metrics.getBuggyness().equals("true") ? "Yes" : "No";
 
                     // Append the data
-                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metrics.getNR() + "," + nAuth + ","
+                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metrics.getNr() + "," + nAuth + ","
                             + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
                             + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numComments + "," +  buggy);
 

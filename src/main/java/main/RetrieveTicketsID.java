@@ -249,7 +249,7 @@ public class RetrieveTicketsID {
     public static void computeProportionIncremental(ArrayList<Issue> issues){
         ArrayList<Double> proportions = new ArrayList<>();
         for ( Issue issue : issues ){
-            if ( !( issue.opening_version == issue.fix_version ) ) {
+            if ( issue.opening_version != issue.fix_version ) {
                 double fv = issue.fix_version;
                 double ov = issue.opening_version;
                 double iv = issue.injected_version;

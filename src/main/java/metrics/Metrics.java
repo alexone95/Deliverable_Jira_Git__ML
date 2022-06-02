@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 public class Metrics {
 
-    private int                 version;
-    private String              filepath;
-    private int                 NR;
-    private ArrayList<String>   AUTHORS = new ArrayList<>();
-    private int                 LOC;
-    private int                 LOC_TOUCHED;
-    private int                 AGE;
-    private int                 CHURN;
-    private int                 MAX_LOC_ADDED;
-    private int                 AVG_LOC_ADDED;
-    private int                 AVG_CHANGE_SET;
-    private int                 MAX_CHANGE_SET;
-    private int                 numImports;
-    private int                 numComments;
-    private String              BUGGYNESS;
+    private int version;
+    private String filepath;
+    private int nr;
+    private ArrayList<String> authors = new ArrayList<>();
+    private int loc;
+    private int locTouched;
+    private int age;
+    private int churn;
+    private int maxLocAdded;
+    private int avgLocAdded;
+    private int avgChangeSet;
+    private int maxChangeSet;
+    private int numImports;
+    private int numComments;
+    private String buggyness;
 
     public int getVersion() {
         return version;
@@ -36,84 +36,84 @@ public class Metrics {
         this.filepath = filepath;
     }
 
-    public int getNR() {
-        return NR;
+    public int getNr() {
+        return nr;
     }
 
-    public void setNR(int NR) {
-        this.NR = NR;
+    public void setNr(int nr) {
+        this.nr = nr;
     }
 
-    public ArrayList<String> getAUTHORS() {
-        return AUTHORS;
+    public ArrayList<String> getAuthors() {
+        return authors;
     }
 
-    public void setAUTHORS(ArrayList<String> AUTHORS) {
-        this.AUTHORS = AUTHORS;
+    public void setAuthors(ArrayList<String> authors) {
+        this.authors = authors;
     }
 
-    public int getLOC() {
-        return LOC;
+    public int getLoc() {
+        return loc;
     }
 
-    public void setLOC(int LOC) {
-        this.LOC = LOC;
+    public void setLoc(int loc) {
+        this.loc = loc;
     }
 
-    public int getLOC_TOUCHED() {
-        return LOC_TOUCHED;
+    public int getLocTouched() {
+        return locTouched;
     }
 
-    public void setLOC_TOUCHED(int LOC_TOUCHED) {
-        this.LOC_TOUCHED = LOC_TOUCHED;
+    public void setLocTouched(int locTouched) {
+        this.locTouched = locTouched;
     }
 
-    public int getAGE() {
-        return AGE;
+    public int getAge() {
+        return age;
     }
 
-    public void setAGE(int AGE) {
-        this.AGE = AGE;
+    public void setAge(int age) {
+        this.age = age;
     }
 
-    public int getCHURN() {
-        return CHURN;
+    public int getChurn() {
+        return churn;
     }
 
-    public void setCHURN(int CHURN) {
-        this.CHURN = CHURN;
+    public void setChurn(int churn) {
+        this.churn = churn;
     }
 
-    public int getMAX_LOC_ADDED() {
-        return MAX_LOC_ADDED;
+    public int getMaxLocAdded() {
+        return maxLocAdded;
     }
 
-    public void setMAX_LOC_ADDED(int MAX_LOC_ADDED) {
-        this.MAX_LOC_ADDED = MAX_LOC_ADDED;
+    public void setMaxLocAdded(int maxLocAdded) {
+        this.maxLocAdded = maxLocAdded;
     }
 
-    public int getAVG_LOC_ADDED() {
-        return AVG_LOC_ADDED;
+    public int getAvgLocAdded() {
+        return avgLocAdded;
     }
 
-    public void setAVG_LOC_ADDED(int AVG_LOC_ADDED) {
-        this.AVG_LOC_ADDED = AVG_LOC_ADDED;
+    public void setAvgLocAdded(int avgLocAdded) {
+        this.avgLocAdded = avgLocAdded;
     }
 
-    public int getAVG_CHANGE_SET() {
-        return AVG_CHANGE_SET;
+    public int getAvgChangeSet() {
+        return avgChangeSet;
     }
 
-    public void setAVG_CHANGE_SET(int AVG_CHANGE_SET) {
-        this.AVG_CHANGE_SET = AVG_CHANGE_SET;
+    public void setAvgChangeSet(int avgChangeSet) {
+        this.avgChangeSet = avgChangeSet;
     }
 
-    public int getMAX_CHANGE_SET() {
-        return MAX_CHANGE_SET;
+    public int getMaxChangeSet() {
+        return maxChangeSet;
     }
 
-    public void setMAX_CHANGE_SET(int MAX_CHANGE_SET) {
-        this.MAX_CHANGE_SET = MAX_CHANGE_SET;
+    public void setMaxChangeSet(int maxChangeSet) {
+        this.maxChangeSet = maxChangeSet;
     }
 
     public int getNumImports() {
@@ -132,51 +132,51 @@ public class Metrics {
         this.numComments = numComments;
     }
 
-    public String getBUGGYNESS() {
-        return BUGGYNESS;
+    public String getBuggyness() {
+        return buggyness;
     }
 
-    public void setBUGGYNESS(String BUGGYNESS) {
-        this.BUGGYNESS = BUGGYNESS;
+    public void setBuggyness(String buggyness) {
+        this.buggyness = buggyness;
     }
 
     public void appendAuthor(String author ){
-        this.AUTHORS.add(author);
+        this.authors.add(author);
     }
 
     public void update( Metrics oldMetrics ) {
-        // Sum up all NR.
-        this.NR += oldMetrics.getNR();
+        // Sum up all nr.
+        this.nr += oldMetrics.getNr();
         /* Append this author to the list of authors who have worked at this file within the release.
            At the end, the size of this array will represent the total number of authors.*/
-        if ( !oldMetrics.getAUTHORS().contains(this.AUTHORS.get(0)) ){
-            ArrayList<String> updateAuthors = oldMetrics.getAUTHORS();
-            updateAuthors.add( this.AUTHORS.get(0) );
-            this.AUTHORS = updateAuthors;
-        } else { this.AUTHORS = oldMetrics.getAUTHORS(); }
-        this.CHURN += oldMetrics.getCHURN();
-        this.LOC_TOUCHED += oldMetrics.getLOC_TOUCHED();
-        // Sum up all LOC ADDED within the release.
-        this.AVG_LOC_ADDED += oldMetrics.getAVG_LOC_ADDED();
+        if ( !oldMetrics.getAuthors().contains(this.authors.get(0)) ){
+            ArrayList<String> updateAuthors = oldMetrics.getAuthors();
+            updateAuthors.add( this.authors.get(0) );
+            this.authors = updateAuthors;
+        } else { this.authors = oldMetrics.getAuthors(); }
+        this.churn += oldMetrics.getChurn();
+        this.locTouched += oldMetrics.getLocTouched();
+        // Sum up all loc ADDED within the release.
+        this.avgLocAdded += oldMetrics.getAvgLocAdded();
         // Get the oldest version of this file within the release.
-        if ( oldMetrics.getAGE() > this.AGE ){
-            this.AGE = oldMetrics.getAGE();
+        if ( oldMetrics.getAge() > this.age){
+            this.age = oldMetrics.getAge();
         }
-        // Sum up all LOC reported for this file over all commits within the release.
-        this.LOC += oldMetrics.getLOC();
-        // Update MAX LOC ADDED only if it is greater than the max loc added reached by previous commits within the release.
-        if (!( this.MAX_LOC_ADDED > oldMetrics.getMAX_LOC_ADDED())){
-            this.MAX_LOC_ADDED = oldMetrics.getMAX_LOC_ADDED();
+        // Sum up all loc reported for this file over all commits within the release.
+        this.loc += oldMetrics.getLoc();
+        // Update MAX loc ADDED only if it is greater than the max loc added reached by previous commits within the release.
+        if (!( this.maxLocAdded > oldMetrics.getMaxLocAdded())){
+            this.maxLocAdded = oldMetrics.getMaxLocAdded();
         }
         // Sum up all CHANGE SET SIZE over commits within the release.
-        this.AVG_CHANGE_SET += oldMetrics.getAVG_CHANGE_SET();
+        this.avgChangeSet += oldMetrics.getAvgChangeSet();
         // Update MAX CHANGE SET only if it is greater than the max chg set reached by previous commits within the release.
-        if (!( this.MAX_CHANGE_SET> oldMetrics.getMAX_CHANGE_SET())){
-            this.MAX_CHANGE_SET = oldMetrics.getMAX_CHANGE_SET();
+        if (!( this.maxChangeSet > oldMetrics.getMaxChangeSet())){
+            this.maxChangeSet = oldMetrics.getMaxChangeSet();
         }
-        // Sum up all LOC reported for this file over all commits within the release.
+        // Sum up all loc reported for this file over all commits within the release.
         this.numImports += oldMetrics.getNumImports();
-        // Sum up all LOC reported for this file over all commits within the release.
+        // Sum up all loc reported for this file over all commits within the release.
         this.numComments += oldMetrics.getNumComments();
 
     }

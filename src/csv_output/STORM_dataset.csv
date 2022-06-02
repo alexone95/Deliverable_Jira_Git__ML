@@ -1,4 +1,4 @@
-Version Number,File Name,NumberRevisions,NumberAuthors,LOC,AGE,CHURN,LOC_TOUCHED,Avg_LOC_Added,MaxLocAdded,Avg_Chg_Set,Max_Chg_Set,numImports,numComments,Buggy
+Version Number,File Name,NumberRevisions,NumberAuthors,loc,age,churn,locTouched,Avg_LOC_Added,MaxLocAdded,Avg_Chg_Set,Max_Chg_Set,numImports,numComments,Buggy
 01,src/jvm/backtype/storm/Config.java,1,1,799,79,5,5,5,5,6,6,7,421,No
 01,src/jvm/backtype/storm/StormSubmitter.java,1,1,130,53,6,6,6,6,1,1,10,17,No
 01,src/jvm/backtype/storm/drpc/DRPCSpout.java,1,1,154,15,0,1,0,0,1,1,19,0,No
