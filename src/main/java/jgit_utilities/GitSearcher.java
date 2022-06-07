@@ -148,8 +148,14 @@ public class GitSearcher {
             int numImports = Utils.getNumImports(fileText);
             int numComments = Utils.getNumComments(fileText);
 
-            changedFilesList.add(new CommitFileDetails(fileName, linesAdded, linesDeleted, linesReplaced,
-                    Utils.countLineBufferedReader(fileText), fileText, age, buggy, numImports, numComments));
+            CommitFileDetails commitFileDetails = new CommitFileDetails(fileName, linesAdded, linesDeleted, linesReplaced,
+                    Utils.countLineBufferedReader(fileText), fileText, age);
+
+            commitFileDetails.setBuggy(buggy);
+            commitFileDetails.setNumImports(numImports);
+            commitFileDetails.setNumComments(numComments);
+
+            changedFilesList.add(commitFileDetails);
         }
         df.close();
         return changedFilesList;

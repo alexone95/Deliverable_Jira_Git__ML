@@ -33,10 +33,10 @@ public class Utils {
     public static void print_files_infoprint_files_info(List<CommitFileDetails> commitFileDetailsList){
         for(CommitFileDetails commitFileDetails : commitFileDetailsList){
             System.out.println("\n");
-            System.out.println("FILE NAME: " + commitFileDetails.modified_file_name);
-            System.out.println("DELETED LOC: " + commitFileDetails.deleted_LOC + "| LOC: " + commitFileDetails.LOC +
-                    "| ADDED LOC: " + commitFileDetails.added_LOC + "| AGE: " + commitFileDetails.age);
-            System.out.println("BUGGY: " + commitFileDetails.buggy);
+            System.out.println("FILE NAME: " + commitFileDetails.getModifiedFileName());
+            System.out.println("DELETED LOC: " + commitFileDetails.getDeletedLOC() + "| LOC: " + commitFileDetails.getLOC() +
+                    "| ADDED LOC: " + commitFileDetails.getAddedLOC() + "| AGE: " + commitFileDetails.getAge());
+            System.out.println("BUGGY: " + commitFileDetails.isBuggy());
             System.out.println("\n");
         }
     }

@@ -40,22 +40,22 @@ public class DatasetBuilder {
                 for ( CommitFileDetails file : commit.getFilesChanged() ){
                     Metrics newMetrics = new Metrics();
                     version = commit.getVersion();
-                    filepath = file.modified_file_name;
+                    filepath = file.getModifiedFileName();
                     newMetrics.setVersion(version);
                     newMetrics.setFilepath(filepath);
                     newMetrics.setNr( 1 );
-                    newMetrics.setAge( file.age);
-                    newMetrics.setChurn(file.churn);
+                    newMetrics.setAge( file.getAge());
+                    newMetrics.setChurn(file.getChurn());
                     newMetrics.appendAuthor(commit.getPerson().getName());
-                    newMetrics.setLocTouched(file.LOC_touched);
-                    newMetrics.setMaxLocAdded(file.added_LOC);
-                    newMetrics.setLoc((int) file.LOC);
-                    newMetrics.setAvgLocAdded(file.added_LOC);
+                    newMetrics.setLocTouched(file.getLOC_touched());
+                    newMetrics.setMaxLocAdded(file.getAddedLOC());
+                    newMetrics.setLoc((int) file.getLOC());
+                    newMetrics.setAvgLocAdded(file.getAddedLOC());
                     newMetrics.setAvgChangeSet(commit.getFilesChanged().size());
                     newMetrics.setMaxChangeSet(commit.getFilesChanged().size());
-                    newMetrics.setNumImports(file.numImports);
-                    newMetrics.setNumComments(file.numComments);
-                    newMetrics.setBuggyness(String.valueOf(file.buggy));
+                    newMetrics.setNumImports(file.getNumImports());
+                    newMetrics.setNumComments(file.getNumComments());
+                    newMetrics.setBuggyness(String.valueOf(file.isBuggy()));
                     if( !fileDataset.containsKey(version,filepath) ){
                         fileDataset.put( version, filepath, newMetrics );
                     } else{
