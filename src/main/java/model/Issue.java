@@ -6,29 +6,29 @@ import java.util.List;
 
 public class Issue {
 
-    public List<CommitDetails> commits;
-    public String issue_key;
-    public String resolutionDate;
-    public String creationDate;
-    public int fix_version;
-    public int opening_version;
-    public int injected_version;
-    public ArrayList<String> affected_version;
-    public ArrayList<Integer> affected_version_index;
+    private List<CommitDetails> commits;
+    private String issueKey;
+    private String resolutionDate;
+    private String creationDate;
+    private int fixVersion;
+    private int openingVersion;
+    private int injectedVersion;
+    private ArrayList<String> affectedVersion;
+    private ArrayList<Integer> affectedVersionIndex;
 
-    public Issue(String issue_key, String resolutionDate, String creationDate, ArrayList<String> affected_version) {
-        this.issue_key = issue_key;
+    public Issue(String issueKey, String resolutionDate, String creationDate, ArrayList<String> affectedVersion) {
+        this.issueKey = issueKey;
         this.resolutionDate = resolutionDate;
         this.creationDate = creationDate;
-        this.affected_version = affected_version;
+        this.affectedVersion = affectedVersion;
     }
 
-    public Issue(List<CommitDetails> commits, String issue_key, String resolutionDate, String creationDate, ArrayList<String> affected_version) {
+    public Issue(List<CommitDetails> commits, String issueKey, String resolutionDate, String creationDate, ArrayList<String> affectedVersion) {
         this.commits = commits;
-        this.issue_key = issue_key;
+        this.issueKey = issueKey;
         this.resolutionDate = resolutionDate;
         this.creationDate = creationDate;
-        this.affected_version = affected_version;
+        this.affectedVersion = affectedVersion;
     }
 
     public List<CommitDetails> getCommits() {
@@ -39,12 +39,12 @@ public class Issue {
         this.commits = commits;
     }
 
-    public String getIssue_key() {
-        return issue_key;
+    public String getIssueKey() {
+        return issueKey;
     }
 
-    public void setIssue_key(String issue_key) {
-        this.issue_key = issue_key;
+    public void setIssueKey(String issueKey) {
+        this.issueKey = issueKey;
     }
 
     public String getResolutionDate() {
@@ -63,35 +63,43 @@ public class Issue {
         this.creationDate = creationDate;
     }
 
-    public int getFix_version() {
-        return fix_version;
+    public int getFixVersion() {
+        return fixVersion;
     }
 
-    public void setFix_version(int fix_version) {
-        this.fix_version = fix_version;
+    public void setFixVersion(int fixVersion) {
+        this.fixVersion = fixVersion;
     }
 
-    public int getOpening_version() {
-        return opening_version;
+    public int getOpeningVersion() {
+        return openingVersion;
     }
 
-    public void setOpening_version(int opening_version) {
-        this.opening_version = opening_version;
+    public void setOpeningVersion(int openingVersion) {
+        this.openingVersion = openingVersion;
     }
 
-    public int getInjected_version() {
-        return injected_version;
+    public int getInjectedVersion() {
+        return injectedVersion;
     }
 
-    public void setInjected_version(int injected_version) {
-        this.injected_version = injected_version;
+    public void setInjectedVersion(int injectedVersion) {
+        this.injectedVersion = injectedVersion;
     }
 
-    public ArrayList<String> getAffected_version() {
-        return affected_version;
+    public ArrayList<String> getAffectedVersion() {
+        return affectedVersion;
     }
 
-    public void setAffected_version(ArrayList<String> affected_version) {
-        this.affected_version = affected_version;
+    public void setAffectedVersion(ArrayList<String> affectedVersion) {
+        this.affectedVersion = affectedVersion;
+    }
+
+    public ArrayList<Integer> getAffectedVersionIndex() {
+        return affectedVersionIndex;
+    }
+
+    public void setAffectedVersionIndex(ArrayList<Integer> affectedVersionIndex) {
+        this.affectedVersionIndex = affectedVersionIndex;
     }
 }

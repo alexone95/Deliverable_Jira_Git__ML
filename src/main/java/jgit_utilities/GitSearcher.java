@@ -84,7 +84,7 @@ public class GitSearcher {
             for( RevCommit commit : revWalk ) {
                 LocalDate commitLocalDate = commit.getCommitterIdent().getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 int version = RetrieveTicketsID.getVersionFromLocalDate( commitLocalDate );
-                if ( issue.fix_version >= version ) {
+                if ( issue.getFixVersion() >= version ) {
                     CommitDetails commitDetail = new CommitDetails();
                     commitDetail.setCommit(commit);
                     commitDetail.setVersion(version);
@@ -144,7 +144,7 @@ public class GitSearcher {
                 }
             }
 
-            boolean buggy = (commitObject.getVersion() < issue.fix_version) && (commitObject.getVersion() >= issue.injected_version);
+            boolean buggy = (commitObject.getVersion() < issue.getFixVersion()) && (commitObject.getVersion() >= issue.getInjectedVersion());
             int numImports = Utils.getNumImports(fileText);
             int numComments = Utils.getNumComments(fileText);
 

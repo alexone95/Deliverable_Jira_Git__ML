@@ -43,15 +43,15 @@ public class Utils {
 
     public static void print_ticket_list(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("\nKEY: " + commitIssue.issue_key );
-            System.out.println("RESOLUTION DATE: " + commitIssue.resolutionDate );
-            System.out.println("CREATION DATE: " + commitIssue.creationDate );
-            System.out.println("AV: " + commitIssue.affected_version.toString() );
-            System.out.println("FIX VERSION: " + commitIssue.fix_version + "| OPENING VERSION: " + commitIssue.opening_version + "| INJECTED VERSION: " + commitIssue.injected_version);
-            for(String affected_version: commitIssue.affected_version){
+            System.out.println("\nKEY: " + commitIssue.getIssueKey());
+            System.out.println("RESOLUTION DATE: " + commitIssue.getResolutionDate() );
+            System.out.println("CREATION DATE: " + commitIssue.getCreationDate() );
+            System.out.println("AV: " + commitIssue.getAffectedVersion().toString() );
+            System.out.println("FIX VERSION: " + commitIssue.getFixVersion() + "| OPENING VERSION: " + commitIssue.getOpeningVersion() + "| INJECTED VERSION: " + commitIssue.getInjectedVersion());
+            for(String affected_version: commitIssue.getAffectedVersion()){
                 System.out.println("AFFECTED VERSION: " + affected_version );
             }
-            for(Integer affected_versionindex: commitIssue.affected_version_index){
+            for(Integer affected_versionindex: commitIssue.getAffectedVersionIndex()){
                 System.out.println("AFFECTED VERSION INDEX: " + affected_versionindex );
 
             }
@@ -62,8 +62,8 @@ public class Utils {
     public static void print_commit_details_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
             System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.issue_key );
-            for(CommitDetails commitDetails : commitIssue.commits){
+            System.out.println("KEY: " + commitIssue.getIssueKey());
+            for(CommitDetails commitDetails : commitIssue.getCommits()){
                 System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName());
                 System.out.println("ADDED LOC: " + commitDetails.getAddedLoc());
                 System.out.println("DELETED LOC: " + commitDetails.getDeletedLoc());
@@ -76,10 +76,10 @@ public class Utils {
     public static void print_full_info_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
             System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.issue_key );
-            System.out.println("RESOLUTION DATE: " + commitIssue.resolutionDate + "| CREATION DATE: " + commitIssue.creationDate );
-            System.out.println("AV: " + commitIssue.affected_version.toString()  + "AV INDEX: " + commitIssue.affected_version_index.toString() + "\n");
-            for(CommitDetails commitDetails : commitIssue.commits){
+            System.out.println("KEY: " + commitIssue.getIssueKey());
+            System.out.println("RESOLUTION DATE: " + commitIssue.getResolutionDate() + "| CREATION DATE: " + commitIssue.getCreationDate() );
+            System.out.println("AV: " + commitIssue.getAffectedVersion().toString()  + "AV INDEX: " + commitIssue.getAffectedVersionIndex().toString() + "\n");
+            for(CommitDetails commitDetails : commitIssue.getCommits()){
                 System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName() + "| COMMIT DATE: "
                         + commitDetails.getCommitDate() + "| VERSION: " + commitDetails.getVersion() + "| PERSON:" +
                         commitDetails.getPerson().getName());
@@ -92,8 +92,8 @@ public class Utils {
     public static void print_file_details_from_ticket(List<Issue> issues){
         for(Issue commitIssue : issues){
             System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.issue_key );
-            for(CommitDetails commitDetails : commitIssue.commits){
+            System.out.println("KEY: " + commitIssue.getIssueKey());
+            for(CommitDetails commitDetails : commitIssue.getCommits()){
                 System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName() + "\n");
                 print_files_infoprint_files_info(commitDetails.getFilesChanged());
             }

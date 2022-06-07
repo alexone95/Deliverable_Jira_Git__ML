@@ -17,7 +17,6 @@ import utils.Utils;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -159,8 +158,8 @@ public class RetrieveTicketsID {
         pb.start();
         for(Issue issue : list_of_issues){
             pb.step();
-            issue.commits = GitSearcher.getAllCommitDetails(GitSearcher.openJGitRepository(), issue.issue_key, issue);
-            pb.setExtraMessage("<- Reading commits ->" + issue.issue_key);
+            issue.setCommits(GitSearcher.getAllCommitDetails(GitSearcher.openJGitRepository(), issue.getIssueKey(), issue));
+            pb.setExtraMessage("<- Reading commits ->" + issue.getIssueKey());
         }
         pb.stop();
 
@@ -182,13 +181,13 @@ public class RetrieveTicketsID {
     public static void setOpeningAndFixedVersions(){
         for ( Issue issue : list_of_issues ){
             for( LocalDate date : version_map.keySet()){
-                issue.fix_version = Integer.parseInt( Iterables.getLast( version_map.get(date) ));
+                issue.setFixVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
                 if ( date.isEqual( LocalDate.parse( issue.getResolutionDate() ) ) || date.isAfter( LocalDate.parse(issue.getResolutionDate()) ) ){
                     break;
                 }
             }
             for( LocalDate date : version_map.keySet()){
-                issue.opening_version =  Integer.parseInt( Iterables.getLast( version_map.get(date) ));
+                issue.setOpeningVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
                 if ( date.isEqual( LocalDate.parse( issue.getCreationDate() ) ) || date.isAfter( LocalDate.parse(issue.getCreationDate()) ) ){
                     break;
                 }
@@ -204,12 +203,12 @@ public class RetrieveTicketsID {
         for ( Issue issue : list_of_issues ){
             // If the current issue has not specified AVs it'll be appended to the array
             // that will be used to perform the Proportion Method.
-            if ( issue.getAffected_version().isEmpty() ){
+            if ( issue.getAffectedVersion().isEmpty() ){
                 list_of_issues_without_AV.add( issue );
             }
             else{
                 ArrayList<Integer> avs = new ArrayList<>();
-                ArrayList<String> affectedVersions = issue.getAffected_version();
+                ArrayList<String> affectedVersions = issue.getAffectedVersion();
                 for ( String version : affectedVersions ){
                     for( LocalDate date : version_map.keySet() ){
                         if ( Iterables.get(version_map.get(date),0).equals( version )){
@@ -220,15 +219,15 @@ public class RetrieveTicketsID {
                 }
                 // Check if the reported affected versions for the current issue are not coherent
                 // with the reported fixed version ( i.e. av > fv ).
-                avs.removeIf( av -> av >= issue.fix_version );
+                avs.removeIf( av -> av >= issue.getFixVersion());
                 if ( avs.isEmpty() ) {
                     list_of_issues_without_AV.add( issue );
                 }
                 else{
                     int minValue = Collections.min( avs );
-                    int maxValue = ( issue.fix_version - 1 );
+                    int maxValue = ( issue.getFixVersion() - 1 );
                     avs = new ArrayList<>( IntStream.rangeClosed(minValue, maxValue).boxed().collect(Collectors.toList()) );
-                    issue.affected_version_index = avs;
+                    issue.setAffectedVersionIndex(avs);
                     list_of_issues_with_AV.add( issue );
                 }
             }
@@ -241,18 +240,18 @@ public class RetrieveTicketsID {
     public static void setInjectedVersionAV(){
         int iv;
         for ( Issue issue : list_of_issues_with_AV ){
-            iv = Collections.min( issue.affected_version_index );
-            issue.injected_version = iv;
+            iv = Collections.min( issue.getAffectedVersionIndex());
+            issue.setInjectedVersion(iv);
         }
     }
 
     public static void computeProportionIncremental(ArrayList<Issue> issues){
         ArrayList<Double> proportions = new ArrayList<>();
         for ( Issue issue : issues ){
-            if ( issue.opening_version != issue.fix_version ) {
-                double fv = issue.fix_version;
-                double ov = issue.opening_version;
-                double iv = issue.injected_version;
+            if ( issue.getOpeningVersion() != issue.getFixVersion()) {
+                double fv = issue.getFixVersion();
+                double ov = issue.getOpeningVersion();
+                double iv = issue.getInjectedVersion();
                 double p = ( fv - iv )/( fv - ov );
                 proportions.add( p );
             }
@@ -262,17 +261,17 @@ public class RetrieveTicketsID {
 
     public static void setAffectedAndInjectedVersionsP(ArrayList<Issue> issues){
         for ( Issue issue : issues ){
-            int fv = issue.fix_version;
-            int ov = issue.opening_version;
+            int fv = issue.getFixVersion();
+            int ov = issue.getOpeningVersion();
             int pInt = (int) p;
             if ( fv == ov ) {
-                issue.injected_version = (fv - (pInt));
+                issue.setInjectedVersion(fv - pInt);
             } else{
-                issue.injected_version = (fv - (( fv - ov ) * pInt )) ;
+                issue.setInjectedVersion(fv - ((fv - ov) * pInt));
             }
-            int minAVValue = issue.injected_version;
-            int maxAVValue = issue.fix_version - 1;
-            issue.affected_version_index = new ArrayList<>( IntStream.rangeClosed(minAVValue, maxAVValue).boxed().collect(Collectors.toList()) );
+            int minAVValue = issue.getInjectedVersion();
+            int maxAVValue = issue.getFixVersion() - 1;
+            issue.setAffectedVersionIndex(new ArrayList<>( IntStream.rangeClosed(minAVValue, maxAVValue).boxed().collect(Collectors.toList()) ));
         }
     }
 
