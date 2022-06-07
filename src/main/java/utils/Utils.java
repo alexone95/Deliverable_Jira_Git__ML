@@ -18,9 +18,16 @@ import weka.filters.supervised.instance.SpreadSubsample;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
 import model.*;
 
 public class Utils {
+
+    private Utils(){
+
+    }
+    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
 
     private static final String TRAINING = "_training.arff";
     private static final String TESTING = "_testing.arff";
@@ -30,72 +37,70 @@ public class Utils {
     private static final String SMOTE = "Smote";
     private static final String NO_SAMPLING = "No sampling";
 
-    public static void print_files_infoprint_files_info(List<CommitFileDetails> commitFileDetailsList){
+    public static void printFilesInfoprintFilesInfo(List<CommitFileDetails> commitFileDetailsList){
         for(CommitFileDetails commitFileDetails : commitFileDetailsList){
-            System.out.println("\n");
-            System.out.println("FILE NAME: " + commitFileDetails.getModifiedFileName());
-            System.out.println("DELETED LOC: " + commitFileDetails.getDeletedLOC() + "| LOC: " + commitFileDetails.getLoc() +
+            LOGGER.info("\n");
+            LOGGER.info("FILE NAME: " + commitFileDetails.getModifiedFileName());
+            LOGGER.info("DELETED LOC: " + commitFileDetails.getDeletedLOC() + "| LOC: " + commitFileDetails.getLoc() +
                     "| ADDED LOC: " + commitFileDetails.getAddedLOC() + "| AGE: " + commitFileDetails.getAge());
-            System.out.println("BUGGY: " + commitFileDetails.isBuggy());
-            System.out.println("\n");
+            LOGGER.info("BUGGY: " + commitFileDetails.isBuggy());
+            LOGGER.info("\n");
         }
     }
 
-    public static void print_ticket_list(List<Issue> issues){
+    public static void printTicketList(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("\nKEY: " + commitIssue.getIssueKey());
-            System.out.println("RESOLUTION DATE: " + commitIssue.getResolutionDate() );
-            System.out.println("CREATION DATE: " + commitIssue.getCreationDate() );
-            System.out.println("AV: " + commitIssue.getAffectedVersion().toString() );
-            System.out.println("FIX VERSION: " + commitIssue.getFixVersion() + "| OPENING VERSION: " + commitIssue.getOpeningVersion() + "| INJECTED VERSION: " + commitIssue.getInjectedVersion());
+            LOGGER.info("\n " + commitIssue.getIssueKey());
+            LOGGER.info("RESOLUTION DATE: " + commitIssue.getResolutionDate() );
+            LOGGER.info("CREATION DATE: " + commitIssue.getCreationDate() );
+            LOGGER.info("AV: " + commitIssue.getAffectedVersion().toString() );
+            LOGGER.info("FIX VERSION: " + commitIssue.getFixVersion() + "| OPENING VERSION: " + commitIssue.getOpeningVersion() + "| INJECTED VERSION: " + commitIssue.getInjectedVersion());
             for(String affected_version: commitIssue.getAffectedVersion()){
-                System.out.println("AFFECTED VERSION: " + affected_version );
+                LOGGER.info("AFFECTED VERSION: " + affected_version );
             }
             for(Integer affected_versionindex: commitIssue.getAffectedVersionIndex()){
-                System.out.println("AFFECTED VERSION INDEX: " + affected_versionindex );
+                LOGGER.info("AFFECTED VERSION INDEX: " + affected_versionindex );
 
             }
 
         }
     }
 
-    public static void print_commit_details_from_ticket(List<Issue> issues){
+    public static void printCommitDetailsFromTicket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.getIssueKey());
+            LOGGER.info("\n");
+            LOGGER.info(commitIssue.getIssueKey());
             for(CommitDetails commitDetails : commitIssue.getCommits()){
-                System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName());
-                System.out.println("ADDED LOC: " + commitDetails.getAddedLoc());
-                System.out.println("DELETED LOC: " + commitDetails.getDeletedLoc());
-                System.out.println("PERSON: " + commitDetails.getPerson().getName());
-                System.out.println("COMMIT DATE: " + commitDetails.getCommitDate());
+                LOGGER.info("ADDED LOC: " + commitDetails.getAddedLoc());
+                LOGGER.info("DELETED LOC: " + commitDetails.getDeletedLoc());
+                LOGGER.info("PERSON: " + commitDetails.getPerson().getName());
+                LOGGER.info("COMMIT DATE: " + commitDetails.getCommitDate());
             }
         }
     }
 
-    public static void print_full_info_from_ticket(List<Issue> issues){
+    public static void printFullInfoFromTicket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.getIssueKey());
-            System.out.println("RESOLUTION DATE: " + commitIssue.getResolutionDate() + "| CREATION DATE: " + commitIssue.getCreationDate() );
-            System.out.println("AV: " + commitIssue.getAffectedVersion().toString()  + "AV INDEX: " + commitIssue.getAffectedVersionIndex().toString() + "\n");
+            LOGGER.info("\n");
+            LOGGER.info(commitIssue.getIssueKey());
+            LOGGER.info("RESOLUTION DATE: " + commitIssue.getResolutionDate() + "| CREATION DATE: " + commitIssue.getCreationDate() );
+            LOGGER.info("AV: " + commitIssue.getAffectedVersion().toString()  + "AV INDEX: " + commitIssue.getAffectedVersionIndex().toString() + "\n");
             for(CommitDetails commitDetails : commitIssue.getCommits()){
-                System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName() + "| COMMIT DATE: "
+                LOGGER.info("COMMIT HASH: " + commitDetails.getCommit().getName() + "| COMMIT DATE: "
                         + commitDetails.getCommitDate() + "| VERSION: " + commitDetails.getVersion() + "| PERSON:" +
                         commitDetails.getPerson().getName());
-                print_files_infoprint_files_info(commitDetails.getFilesChanged());
-                System.out.println("\n");
+                printFilesInfoprintFilesInfo(commitDetails.getFilesChanged());
+                LOGGER.info("\n");
             }
         }
     }
 
-    public static void print_file_details_from_ticket(List<Issue> issues){
+    public static void printFileDetailsFromTicket(List<Issue> issues){
         for(Issue commitIssue : issues){
-            System.out.println("\n");
-            System.out.println("KEY: " + commitIssue.getIssueKey());
+            LOGGER.info("\n");
+            LOGGER.info("KEY: " + commitIssue.getIssueKey());
             for(CommitDetails commitDetails : commitIssue.getCommits()){
-                System.out.println("COMMIT HASH: " + commitDetails.getCommit().getName() + "\n");
-                print_files_infoprint_files_info(commitDetails.getFilesChanged());
+                printFilesInfoprintFilesInfo(commitDetails.getFilesChanged());
             }
         }
     }
@@ -337,7 +342,7 @@ public class Utils {
 
             }
         } catch (Exception e) {
-            System.out.println("Attenzione. Classe minoritaria insufficiente per SMOTE.");
+            LOGGER.info("Attenzione. Classe minoritaria insufficiente per SMOTE.");
         }
         return eval;
     }

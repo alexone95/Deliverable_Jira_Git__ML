@@ -326,7 +326,7 @@ public class RetrieveTicketsID {
 
             populateDatasetMapAndWriteToCSV();
 
-            Utils.print_full_info_from_ticket(list_of_issues);
+            Utils.printFullInfoFromTicket(list_of_issues);
         }
 
         Classifier.train();
