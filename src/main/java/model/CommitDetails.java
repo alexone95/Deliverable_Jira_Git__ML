@@ -47,7 +47,7 @@ public class CommitDetails {
 
     public void setAdded_loc() {
         for( CommitFileDetails commitFileDetails: this.filesChanged){
-            this.addedLoc += commitFileDetails.added_LOC;
+            this.addedLoc += commitFileDetails.getAddedLOC();
         }
     }
 
@@ -57,7 +57,7 @@ public class CommitDetails {
 
     public void setDeleted_loc() {
         for( CommitFileDetails commitFileDetails: this.filesChanged){
-            this.deletedLoc += commitFileDetails.deleted_LOC;
+            this.deletedLoc += commitFileDetails.getDeletedLOC();
         }
     }
 

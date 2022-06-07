@@ -1,8 +1,6 @@
 package jgit_utilities;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,17 +34,17 @@ public class GitSearcher {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String REPOPATH = "C:/Users/daniele/IdeaProjects/storm/.git";
+    public static String REPOPATH;
     public static final String FILEEXTENSION = ".java";
 
-    public static int getFileAge(RevCommit startCommit, String filename ) throws IOException {
+    public static int getFileAge(RevCommit startCommit, String filename) throws IOException {
         Date dateFirstCommit;
         Date dateCurrentCommit;
         int age;
         try (Repository repository = openJGitRepository()) {
-            RevWalk revWalk = new RevWalk( repository );
-            revWalk.markStart( revWalk.parseCommit( repository.resolve( startCommit.getName() ) ) );
-            revWalk.setTreeFilter( PathFilter.create( filename ) );
+            RevWalk revWalk = new RevWalk(repository);
+            revWalk.markStart( revWalk.parseCommit(repository.resolve(startCommit.getName())));
+            revWalk.setTreeFilter( PathFilter.create(filename) );
             revWalk.sort( RevSort.COMMIT_TIME_DESC );
             revWalk.sort( RevSort.REVERSE, true );
             RevCommit commit = revWalk.next();
@@ -62,6 +60,9 @@ public class GitSearcher {
 
     public static Repository openJGitRepository() throws IOException{
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
+            REPOPATH = br.readLine();
+        }
         return builder.setGitDir(new File(REPOPATH))
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
@@ -104,6 +105,9 @@ public class GitSearcher {
 
 
     public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
+        try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
+            REPOPATH = br.readLine();
+        }
         Git git = Git.open(new File(REPOPATH));
         List<CommitFileDetails> changedFilesList = new ArrayList<>();
         int linesAdded = 0;
