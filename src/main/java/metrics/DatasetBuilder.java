@@ -47,9 +47,9 @@ public class DatasetBuilder {
                     newMetrics.setAge( file.getAge());
                     newMetrics.setChurn(file.getChurn());
                     newMetrics.appendAuthor(commit.getPerson().getName());
-                    newMetrics.setLocTouched(file.getLOC_touched());
+                    newMetrics.setLocTouched(file.getLocTouched());
                     newMetrics.setMaxLocAdded(file.getAddedLOC());
-                    newMetrics.setLoc((int) file.getLOC());
+                    newMetrics.setLoc((int) file.getLoc());
                     newMetrics.setAvgLocAdded(file.getAddedLOC());
                     newMetrics.setAvgChangeSet(commit.getFilesChanged().size());
                     newMetrics.setMaxChangeSet(commit.getFilesChanged().size());

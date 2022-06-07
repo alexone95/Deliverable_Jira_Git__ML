@@ -34,7 +34,7 @@ public class Utils {
         for(CommitFileDetails commitFileDetails : commitFileDetailsList){
             System.out.println("\n");
             System.out.println("FILE NAME: " + commitFileDetails.getModifiedFileName());
-            System.out.println("DELETED LOC: " + commitFileDetails.getDeletedLOC() + "| LOC: " + commitFileDetails.getLOC() +
+            System.out.println("DELETED LOC: " + commitFileDetails.getDeletedLOC() + "| LOC: " + commitFileDetails.getLoc() +
                     "| ADDED LOC: " + commitFileDetails.getAddedLOC() + "| AGE: " + commitFileDetails.getAge());
             System.out.println("BUGGY: " + commitFileDetails.isBuggy());
             System.out.println("\n");

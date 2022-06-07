@@ -4,25 +4,25 @@ public class CommitFileDetails {
     private String modifiedFileName;
     private int addedLOC;
     private int deletedLOC;
-    private long LOC;
+    private long loc;
     private String fileText;
     private int age;
     private boolean buggy;
     private int churn;
     private int numImports;
     private int numComments;
-    private int LOC_touched;
+    private int locTouched;
 
-    public CommitFileDetails(String modifiedFileName, int addedLOC, int deletedLOC, int replaced_lines, long LOC, String fileText,
+    public CommitFileDetails(String modifiedFileName, int addedLOC, int deletedLOC, int replaced_lines, long loc, String fileText,
                              int age) {
         this.modifiedFileName = modifiedFileName;
         this.addedLOC = addedLOC;
         this.deletedLOC = deletedLOC;
-        this.LOC = LOC;
+        this.loc = loc;
         this.fileText = fileText;
         this.age = age;
         this.churn = addedLOC - deletedLOC;
-        this.LOC_touched = replaced_lines + addedLOC + deletedLOC;
+        this.locTouched = replaced_lines + addedLOC + deletedLOC;
     }
 
     public String getModifiedFileName() {
@@ -49,12 +49,12 @@ public class CommitFileDetails {
         this.deletedLOC = deletedLOC;
     }
 
-    public long getLOC() {
-        return LOC;
+    public long getLoc() {
+        return loc;
     }
 
-    public void setLOC(int LOC) {
-        this.LOC = LOC;
+    public void setLoc(int loc) {
+        this.loc = loc;
     }
 
     public String getFileText() {
@@ -105,15 +105,15 @@ public class CommitFileDetails {
         this.numComments = numComments;
     }
 
-    public int getLOC_touched() {
-        return LOC_touched;
+    public int getLocTouched() {
+        return locTouched;
     }
 
-    public void setLOC_touched(int LOC_touched) {
-        this.LOC_touched = LOC_touched;
+    public void setLocTouched(int locTouched) {
+        this.locTouched = locTouched;
     }
 
     public void setLOC(long LOC) {
-        this.LOC = LOC;
+        this.loc = LOC;
     }
 }
