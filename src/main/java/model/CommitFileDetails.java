@@ -13,7 +13,7 @@ public class CommitFileDetails {
     private int numComments;
     private int locTouched;
 
-    public CommitFileDetails(String modifiedFileName, int addedLOC, int deletedLOC, int replaced_lines, long loc, String fileText,
+    public CommitFileDetails(String modifiedFileName, int addedLOC, int deletedLOC, int replacedLines, long loc, String fileText,
                              int age) {
         this.modifiedFileName = modifiedFileName;
         this.addedLOC = addedLOC;
@@ -22,7 +22,7 @@ public class CommitFileDetails {
         this.fileText = fileText;
         this.age = age;
         this.churn = addedLOC - deletedLOC;
-        this.locTouched = replaced_lines + addedLOC + deletedLOC;
+        this.locTouched = replacedLines + addedLOC + deletedLOC;
     }
 
     public String getModifiedFileName() {
