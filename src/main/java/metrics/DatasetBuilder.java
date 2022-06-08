@@ -3,7 +3,7 @@ package metrics;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,7 +32,7 @@ public class DatasetBuilder {
     }
 
     /*  This Method is used to populate the  Multi Key Map representing the dataset to be created. */
-    public void populateFileDataset( ArrayList<Issue> issues ){
+    public void populateFileDataset( List<Issue> issues ){
         int     version;
         String  filepath;
         for ( Issue issue : issues ){

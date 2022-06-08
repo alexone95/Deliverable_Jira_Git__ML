@@ -89,8 +89,8 @@ public class GitSearcher {
                     commitDetail.setVersion(version);
                     commitDetail.setFilesChanged(commitChanges(commit, commitDetail, issue));
                     commitDetail.setPerson(commit.getAuthorIdent());
-                    commitDetail.setAdded_loc();
-                    commitDetail.setDeleted_loc();
+                    commitDetail.setAddedLoc();
+                    commitDetail.setDeletedLoc();
                     commitDetail.setFullMessage(commit.getFullMessage());
                     commitDetail.setCommitDate(formatter.format(commitDetail.getPerson().getWhen()));
 

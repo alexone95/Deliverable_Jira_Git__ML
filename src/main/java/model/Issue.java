@@ -16,19 +16,19 @@ public class Issue {
     private ArrayList<String> affectedVersion;
     private ArrayList<Integer> affectedVersionIndex;
 
-    public Issue(String issueKey, String resolutionDate, String creationDate, ArrayList<String> affectedVersion) {
+    public Issue(String issueKey, String resolutionDate, String creationDate, List<String> affectedVersion) {
         this.issueKey = issueKey;
         this.resolutionDate = resolutionDate;
         this.creationDate = creationDate;
-        this.affectedVersion = affectedVersion;
+        this.affectedVersion = (ArrayList<String>) affectedVersion;
     }
 
-    public Issue(List<CommitDetails> commits, String issueKey, String resolutionDate, String creationDate, ArrayList<String> affectedVersion) {
+    public Issue(List<CommitDetails> commits, String issueKey, String resolutionDate, String creationDate, List<String> affectedVersion) {
         this.commits = commits;
         this.issueKey = issueKey;
         this.resolutionDate = resolutionDate;
         this.creationDate = creationDate;
-        this.affectedVersion = affectedVersion;
+        this.affectedVersion = (ArrayList<String>) affectedVersion;
     }
 
     public List<CommitDetails> getCommits() {
@@ -87,7 +87,7 @@ public class Issue {
         this.injectedVersion = injectedVersion;
     }
 
-    public ArrayList<String> getAffectedVersion() {
+    public List<String> getAffectedVersion() {
         return affectedVersion;
     }
 
@@ -95,11 +95,11 @@ public class Issue {
         this.affectedVersion = affectedVersion;
     }
 
-    public ArrayList<Integer> getAffectedVersionIndex() {
+    public List<Integer> getAffectedVersionIndex() {
         return affectedVersionIndex;
     }
 
-    public void setAffectedVersionIndex(ArrayList<Integer> affectedVersionIndex) {
-        this.affectedVersionIndex = affectedVersionIndex;
+    public void setAffectedVersionIndex(List<Integer> affectedVersionIndex) {
+        this.affectedVersionIndex = (ArrayList<Integer>) affectedVersionIndex;
     }
 }

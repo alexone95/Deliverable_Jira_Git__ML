@@ -45,7 +45,7 @@ public class CommitDetails {
         return addedLoc;
     }
 
-    public void setAdded_loc() {
+    public void setAddedLoc() {
         for( CommitFileDetails commitFileDetails: this.filesChanged){
             this.addedLoc += commitFileDetails.getAddedLOC();
         }
@@ -55,7 +55,7 @@ public class CommitDetails {
         return deletedLoc;
     }
 
-    public void setDeleted_loc() {
+    public void setDeletedLoc() {
         for( CommitFileDetails commitFileDetails: this.filesChanged){
             this.deletedLoc += commitFileDetails.getDeletedLOC();
         }
@@ -67,14 +67,6 @@ public class CommitDetails {
 
     public void setFullMessage(String fullMessage) {
         this.fullMessage = fullMessage;
-    }
-
-    public void setAddedLoc(int addedLoc) {
-        this.addedLoc = addedLoc;
-    }
-
-    public void setDeletedLoc(int deletedLoc) {
-        this.deletedLoc = deletedLoc;
     }
 
     public int getVersion() {

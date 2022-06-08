@@ -27,8 +27,8 @@ public class RetrieveTicketsID {
     public static final String PROJECT_NAME ="STORM";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
-    private static final ArrayList<Issue> list_of_issues_with_AV = new ArrayList<>();
-    private static final ArrayList<Issue> list_of_issues_without_AV = new ArrayList<>();
+    private static final List<Issue> list_of_issues_with_AV = new ArrayList<>();
+    private static final List<Issue> list_of_issues_without_AV = new ArrayList<>();
 
     private static double p;
     public static final String RELEASE_DATE = "releaseDate";
@@ -90,7 +90,7 @@ public class RetrieveTicketsID {
 
     /* This Method takes the JSON Array containing all affected versions specified for the ticket
     and returns a String ArrayList containing only those having an associated release date. */
-    public static ArrayList<String> getJsonAffectedVersionList(JSONArray avArray) throws JSONException {
+    public static List<String> getJsonAffectedVersionList(JSONArray avArray) throws JSONException {
         ArrayList<String> affectedVersions = new ArrayList<>();
         if ( avArray.length() > 0 ) {
             // For each release in the AV version
@@ -142,9 +142,9 @@ public class RetrieveTicketsID {
                 JSONArray avArray = currentIssue.getJSONArray("versions");
 
                 // Get a List from the JSONArray with only dated affected versions.
-                ArrayList<String> avList = getJsonAffectedVersionList( avArray );
+                List<String> avList = getJsonAffectedVersionList( avArray );
 
-                Issue issue = new Issue( key, resolutionDate, creationDate, avList );
+                Issue issue = new Issue( key, resolutionDate, creationDate, (ArrayList<String>) avList);
 
                 list_of_issues.add(issue);
 
@@ -165,7 +165,7 @@ public class RetrieveTicketsID {
 
     }
 
-    public static double average( ArrayList<Double> array ){
+    public static double average( List<Double> array ){
         double avg = 0.0;
         double sum = 0.0;
         for ( double p : array ){
@@ -208,7 +208,7 @@ public class RetrieveTicketsID {
             }
             else{
                 ArrayList<Integer> avs = new ArrayList<>();
-                ArrayList<String> affectedVersions = issue.getAffectedVersion();
+                List<String> affectedVersions = issue.getAffectedVersion();
                 for ( String version : affectedVersions ){
                     for( LocalDate date : version_map.keySet() ){
                         if ( Iterables.get(version_map.get(date),0).equals( version )){
@@ -245,7 +245,7 @@ public class RetrieveTicketsID {
         }
     }
 
-    public static void computeProportionIncremental(ArrayList<Issue> issues){
+    public static void computeProportionIncremental(List<Issue> issues){
         ArrayList<Double> proportions = new ArrayList<>();
         for ( Issue issue : issues ){
             if ( issue.getOpeningVersion() != issue.getFixVersion()) {
@@ -259,7 +259,7 @@ public class RetrieveTicketsID {
         p = average( proportions );
     }
 
-    public static void setAffectedAndInjectedVersionsP(ArrayList<Issue> issues){
+    public static void setAffectedAndInjectedVersionsP(List<Issue> issues){
         for ( Issue issue : issues ){
             int fv = issue.getFixVersion();
             int ov = issue.getOpeningVersion();

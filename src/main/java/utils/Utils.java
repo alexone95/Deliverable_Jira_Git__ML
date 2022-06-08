@@ -18,6 +18,7 @@ import weka.filters.supervised.instance.SpreadSubsample;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import model.*;
@@ -53,10 +54,9 @@ public class Utils {
             LOGGER.info("\n " + commitIssue.getIssueKey());
             LOGGER.info("RESOLUTION DATE: " + commitIssue.getResolutionDate() );
             LOGGER.info("CREATION DATE: " + commitIssue.getCreationDate() );
-            LOGGER.info("AV: " + commitIssue.getAffectedVersion().toString() );
             LOGGER.info("FIX VERSION: " + commitIssue.getFixVersion() + "| OPENING VERSION: " + commitIssue.getOpeningVersion() + "| INJECTED VERSION: " + commitIssue.getInjectedVersion());
             for(String affected_version: commitIssue.getAffectedVersion()){
-                LOGGER.info("AFFECTED VERSION: " + affected_version );
+                LOGGER.log(Level.SEVERE, "AFFECTED VERSION: {0}", affected_version );
             }
             for(Integer affected_versionindex: commitIssue.getAffectedVersionIndex()){
                 LOGGER.info("AFFECTED VERSION INDEX: " + affected_versionindex );

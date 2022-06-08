@@ -112,8 +112,4 @@ public class CommitFileDetails {
     public void setLocTouched(int locTouched) {
         this.locTouched = locTouched;
     }
-
-    public void setLOC(long LOC) {
-        this.loc = LOC;
-    }
 }
