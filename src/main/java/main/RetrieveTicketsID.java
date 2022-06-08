@@ -144,7 +144,7 @@ public class RetrieveTicketsID {
                 // Get a List from the JSONArray with only dated affected versions.
                 List<String> avList = getJsonAffectedVersionList( avArray );
 
-                Issue issue = new Issue( key, resolutionDate, creationDate, (ArrayList<String>) avList);
+                Issue issue = new Issue( key, resolutionDate, creationDate, avList);
 
                 list_of_issues.add(issue);
 

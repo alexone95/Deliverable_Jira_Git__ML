@@ -1,6 +1,7 @@
 package metrics;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Metrics {
 
@@ -44,12 +45,12 @@ public class Metrics {
         this.nr = nr;
     }
 
-    public ArrayList<String> getAuthors() {
+    public List<String> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(ArrayList<String> authors) {
-        this.authors = authors;
+    public void setAuthors(List<String> authors) {
+        this.authors = (ArrayList<String>) authors;
     }
 
     public int getLoc() {
@@ -150,10 +151,10 @@ public class Metrics {
         /* Append this author to the list of authors who have worked at this file within the release.
            At the end, the size of this array will represent the total number of authors.*/
         if ( !oldMetrics.getAuthors().contains(this.authors.get(0)) ){
-            ArrayList<String> updateAuthors = oldMetrics.getAuthors();
+            ArrayList<String> updateAuthors = (ArrayList<String>) oldMetrics.getAuthors();
             updateAuthors.add( this.authors.get(0) );
             this.authors = updateAuthors;
-        } else { this.authors = oldMetrics.getAuthors(); }
+        } else { this.authors = (ArrayList<String>) oldMetrics.getAuthors(); }
         this.churn += oldMetrics.getChurn();
         this.locTouched += oldMetrics.getLocTouched();
         // Sum up all loc ADDED within the release.

@@ -59,8 +59,7 @@ public class Utils {
                 LOGGER.log(Level.SEVERE, "AFFECTED VERSION: {0}", affected_version );
             }
             for(Integer affected_versionindex: commitIssue.getAffectedVersionIndex()){
-                LOGGER.info("AFFECTED VERSION INDEX: " + affected_versionindex );
-
+                LOGGER.log(Level.SEVERE, "AFFECTED VERSION INDEX: {0}", affected_versionindex );
             }
 
         }
@@ -84,7 +83,6 @@ public class Utils {
             LOGGER.info("\n");
             LOGGER.info(commitIssue.getIssueKey());
             LOGGER.info("RESOLUTION DATE: " + commitIssue.getResolutionDate() + "| CREATION DATE: " + commitIssue.getCreationDate() );
-            LOGGER.info("AV: " + commitIssue.getAffectedVersion().toString()  + "AV INDEX: " + commitIssue.getAffectedVersionIndex().toString() + "\n");
             for(CommitDetails commitDetails : commitIssue.getCommits()){
                 LOGGER.info("COMMIT HASH: " + commitDetails.getCommit().getName() + "| COMMIT DATE: "
                         + commitDetails.getCommitDate() + "| VERSION: " + commitDetails.getVersion() + "| PERSON:" +
@@ -105,11 +103,11 @@ public class Utils {
         }
     }
 
-    public static long countLineBufferedReader(String file_text) {
+    public static long countLineBufferedReader(String fileText) {
 
         long lines = 0;
         String line= "";
-        try (BufferedReader reader = new BufferedReader(new StringReader(file_text))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(fileText))) {
             while(line != null ){
                 line = reader.readLine();
                 lines++;

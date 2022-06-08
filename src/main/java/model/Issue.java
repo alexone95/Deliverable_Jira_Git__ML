@@ -91,8 +91,8 @@ public class Issue {
         return affectedVersion;
     }
 
-    public void setAffectedVersion(ArrayList<String> affectedVersion) {
-        this.affectedVersion = affectedVersion;
+    public void setAffectedVersion(List<String> affectedVersion) {
+        this.affectedVersion = (ArrayList<String>) affectedVersion;
     }
 
     public List<Integer> getAffectedVersionIndex() {
