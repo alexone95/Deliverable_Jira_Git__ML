@@ -34,9 +34,6 @@ public class GitSearcher {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String REPOPATH;
-    public static final String FILEEXTENSION = ".java";
-
     public static int getFileAge(RevCommit startCommit, String filename) throws IOException {
         Date dateFirstCommit;
         Date dateCurrentCommit;
@@ -60,10 +57,11 @@ public class GitSearcher {
 
     public static Repository openJGitRepository() throws IOException{
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
+        String repopath_f;
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
-            REPOPATH = br.readLine();
+            repopath_f = br.readLine();
         }
-        return builder.setGitDir(new File(REPOPATH))
+        return builder.setGitDir(new File(repopath_f))
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
                 .build();
@@ -105,10 +103,12 @@ public class GitSearcher {
 
 
     public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
+        String fileExtension = ".java";
+        String repopath_f;
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
-            REPOPATH = br.readLine();
+            repopath_f = br.readLine();
         }
-        Git git = Git.open(new File(REPOPATH));
+        Git git = Git.open(new File(repopath_f));
         List<CommitFileDetails> changedFilesList = new ArrayList<>();
         int linesAdded = 0;
         int linesDeleted = 0;
@@ -129,7 +129,7 @@ public class GitSearcher {
             linesAdded = 0;
             linesDeleted = 0;
             linesReplaced = 0;
-            if (!fileName.endsWith(FILEEXTENSION)) {
+            if (!fileName.endsWith(fileExtension)) {
                 continue;
             }
             String fileText = getTextfromCommittedFile(commit, fileName);
