@@ -57,11 +57,11 @@ public class GitSearcher {
 
     public static Repository openJGitRepository() throws IOException{
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        String repopath_f;
+        String repopathF;
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
-            repopath_f = br.readLine();
+            repopathF = br.readLine();
         }
-        return builder.setGitDir(new File(repopath_f))
+        return builder.setGitDir(new File(repopathF))
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
                 .build();
@@ -104,11 +104,11 @@ public class GitSearcher {
 
     public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
         String fileExtension = ".java";
-        String repopath_f;
+        String repopathF;
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
-            repopath_f = br.readLine();
+            repopathF = br.readLine();
         }
-        Git git = Git.open(new File(repopath_f));
+        Git git = Git.open(new File(repopathF));
         List<CommitFileDetails> changedFilesList = new ArrayList<>();
         int linesAdded = 0;
         int linesDeleted = 0;
