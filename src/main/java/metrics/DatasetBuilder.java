@@ -16,7 +16,7 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 public class DatasetBuilder {
 
     // Dataset as a MultiKeyMap with key :<version,filepath> and value <metrics>
-    private MultiKeyMap fileDataset = MultiKeyMap.multiKeyMap( new LinkedMap() );
+    private MultiKeyMap<Object, Object> fileDataset = MultiKeyMap.multiKeyMap( new LinkedMap<>() );
 
     private Multimap<LocalDate,String> versionMap;
 
