@@ -30,7 +30,7 @@ import utils.Utils;
 import main.RetrieveTicketsID;
 
 public class GitSearcher {
-    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GitSearcher.class.getName());
 
     private GitSearcher() {
         throw new IllegalStateException("Utility class");
