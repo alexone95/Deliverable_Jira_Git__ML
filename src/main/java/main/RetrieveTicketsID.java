@@ -211,7 +211,7 @@ public class RetrieveTicketsID {
             else{
                 ArrayList<Integer> avs = new ArrayList<>();
                 List<String> affectedVersions = issue.getAffectedVersion();
-                avs = fillAffectedVersionList(affectedVersions, version_map);
+                avs = (ArrayList<Integer>) fillAffectedVersionList(affectedVersions, version_map);
                 // Check if the reported affected versions for the current issue are not coherent
                 // with the reported fixed version ( i.e. av > fv ).
                 avs.removeIf( av -> av >= issue.getFixVersion());

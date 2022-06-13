@@ -452,12 +452,12 @@ public class Utils {
         return (commitVersion < fixVersion) && (commitVersion >= injectedVersion);
     }
 
-    public static ArrayList<Integer> fillAffectedVersionList(List<String> affectedVersions, Multimap<LocalDate, String> version_map){
+    public static List<Integer> fillAffectedVersionList(List<String> affectedVersions, Multimap<LocalDate, String> versionMap){
         ArrayList<Integer> avs = new ArrayList<>();
         for ( String version : affectedVersions ){
-            for( LocalDate date : version_map.keySet() ){
-                if ( Iterables.get(version_map.get(date),0).equals( version )){
-                    avs.add( Integer.valueOf( Iterables.getLast( version_map.get(date) )) );
+            for( LocalDate date : versionMap.keySet() ){
+                if ( Iterables.get(versionMap.get(date),0).equals( version )){
+                    avs.add( Integer.valueOf( Iterables.getLast( versionMap.get(date) )) );
                     break;
                 }
             }
