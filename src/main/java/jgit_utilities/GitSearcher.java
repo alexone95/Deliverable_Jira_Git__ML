@@ -113,7 +113,6 @@ public class GitSearcher {
         int linesAdded = 0;
         int linesDeleted = 0;
         int linesReplaced = 0;
-        int nothing = 0;
 
         DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
         df.setRepository(openJGitRepository());
@@ -142,7 +141,7 @@ public class GitSearcher {
                     case "REPLACED" -> linesReplaced += edit.getEndB() - edit.getBeginB();
                     case "DELETED" -> linesDeleted += edit.getEndA() - edit.getBeginA();
                     case "ADDED" -> linesAdded += edit.getEndB() - edit.getBeginB();
-                    default -> nothing += 1;
+                    default -> System.out.println("default");
                 }
             }
 
