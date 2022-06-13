@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import model.CommitDetails;
 import model.CommitFileDetails;
@@ -29,6 +30,7 @@ import utils.Utils;
 import main.RetrieveTicketsID;
 
 public class GitSearcher {
+    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
 
     private GitSearcher() {
         throw new IllegalStateException("Utility class");
@@ -141,7 +143,7 @@ public class GitSearcher {
                     case "REPLACED" -> linesReplaced += edit.getEndB() - edit.getBeginB();
                     case "DELETED" -> linesDeleted += edit.getEndA() - edit.getBeginA();
                     case "ADDED" -> linesAdded += edit.getEndB() - edit.getBeginB();
-                    default -> System.out.println("default");
+                    default -> LOGGER.info("default in switch");
                 }
             }
 
