@@ -132,7 +132,7 @@ public class DatasetBuilder {
             // Iterate over the dataset
             while ( dataSetIterator.hasNext() ) {
                 dataSetIterator.next();
-                var key = (MultiKey) dataSetIterator.getKey();
+                var key = dataSetIterator.getKey();
 
                 int version = (int) key.getKey(0);
                 if ( version <= lastVersion + 1 ){
