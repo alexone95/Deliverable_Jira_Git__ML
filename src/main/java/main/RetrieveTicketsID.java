@@ -22,6 +22,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static utils.Utils.fillAffectedVersionList;
+
 public class RetrieveTicketsID {
 
     public static final String PROJECT_NAME ="STORM";
@@ -209,14 +211,7 @@ public class RetrieveTicketsID {
             else{
                 ArrayList<Integer> avs = new ArrayList<>();
                 List<String> affectedVersions = issue.getAffectedVersion();
-                for ( String version : affectedVersions ){
-                    for( LocalDate date : version_map.keySet() ){
-                        if ( Iterables.get(version_map.get(date),0).equals( version )){
-                            avs.add( Integer.valueOf( Iterables.getLast( version_map.get(date) )) );
-                            break;
-                        }
-                    }
-                }
+                avs = fillAffectedVersionList(affectedVersions, version_map);
                 // Check if the reported affected versions for the current issue are not coherent
                 // with the reported fixed version ( i.e. av > fv ).
                 avs.removeIf( av -> av >= issue.getFixVersion());

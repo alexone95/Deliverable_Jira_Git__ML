@@ -1,5 +1,7 @@
 package utils;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import org.eclipse.jgit.diff.Edit;
 import weka.attributeSelection.CfsSubsetEval;
 import weka.attributeSelection.GreedyStepwise;
@@ -17,6 +19,7 @@ import weka.filters.supervised.instance.SMOTE;
 import weka.filters.supervised.instance.SpreadSubsample;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -447,6 +450,19 @@ public class Utils {
 
     public static boolean retrieveBugginess(int commitVersion, int fixVersion, int injectedVersion){
         return (commitVersion < fixVersion) && (commitVersion >= injectedVersion);
+    }
+
+    public static ArrayList<Integer> fillAffectedVersionList(List<String> affectedVersions, Multimap<LocalDate, String> version_map){
+        ArrayList<Integer> avs = new ArrayList<>();
+        for ( String version : affectedVersions ){
+            for( LocalDate date : version_map.keySet() ){
+                if ( Iterables.get(version_map.get(date),0).equals( version )){
+                    avs.add( Integer.valueOf( Iterables.getLast( version_map.get(date) )) );
+                    break;
+                }
+            }
+        }
+        return avs;
     }
 
 }

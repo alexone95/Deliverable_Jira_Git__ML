@@ -141,8 +141,6 @@ public class GitSearcher {
                     case "REPLACED" -> linesReplaced += edit.getEndB() - edit.getBeginB();
                     case "DELETED" -> linesDeleted += edit.getEndA() - edit.getBeginA();
                     case "ADDED" -> linesAdded += edit.getEndB() - edit.getBeginB();
-                    default -> {
-                    }
                 }
             }
 
