@@ -137,18 +137,16 @@ public class GitSearcher {
             int age = getFileAge(commit, fileName);
 
             for (Edit edit : df.toFileHeader(diff).toEditList()) {
-                if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-                    linesReplaced += edit.getEndB() - edit.getBeginB();
-                }
-                if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB() ){
-                    linesDeleted += edit.getEndA() - edit.getBeginA();
-                }
-                if ( edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-                    linesAdded += edit.getEndB() - edit.getBeginB();
+                switch (Utils.modifiedLocRetrieverMode(edit)) {
+                    case "REPLACED" -> linesReplaced += edit.getEndB() - edit.getBeginB();
+                    case "DELETED" -> linesDeleted += edit.getEndA() - edit.getBeginA();
+                    case "ADDED" -> linesAdded += edit.getEndB() - edit.getBeginB();
+                    default -> {
+                    }
                 }
             }
 
-            boolean buggy = (commitObject.getVersion() < issue.getFixVersion()) && (commitObject.getVersion() >= issue.getInjectedVersion());
+            boolean buggy = Utils.retrieveBugginess(commitObject.getVersion(), issue.getFixVersion(), issue.getInjectedVersion());
             int numImports = Utils.getNumImports(fileText);
             int numComments = Utils.getNumComments(fileText);
 

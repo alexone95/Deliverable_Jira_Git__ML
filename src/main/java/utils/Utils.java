@@ -1,5 +1,6 @@
 package utils;
 
+import org.eclipse.jgit.diff.Edit;
 import weka.attributeSelection.CfsSubsetEval;
 import weka.attributeSelection.GreedyStepwise;
 import weka.classifiers.AbstractClassifier;
@@ -429,6 +430,23 @@ public class Utils {
         return result;
 
 
+    }
+
+    public static String modifiedLocRetrieverMode( Edit edit){
+        if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
+            return "REPLACED";
+        }
+        if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB() ){
+            return "DELETED";
+        }
+        if ( edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
+            return "ADDED";
+        }
+        return "";
+    }
+
+    public static boolean retrieveBugginess(int commitVersion, int fixVersion, int injectedVersion){
+        return (commitVersion < fixVersion) && (commitVersion >= injectedVersion);
     }
 
 }
