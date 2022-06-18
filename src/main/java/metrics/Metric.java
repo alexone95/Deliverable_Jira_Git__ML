@@ -3,7 +3,7 @@ package metrics;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Metrics {
+public class Metric {
 
     private int version;
     private String filepath;
@@ -145,40 +145,40 @@ public class Metrics {
         this.authors.add(author);
     }
 
-    public void update( Metrics oldMetrics ) {
+    public void update( Metric oldMetric) {
         // Sum up all nr.
-        this.nr += oldMetrics.getNr();
+        this.nr += oldMetric.getNr();
         /* Append this author to the list of authors who have worked at this file within the release.
            At the end, the size of this array will represent the total number of authors.*/
-        if ( !oldMetrics.getAuthors().contains(this.authors.get(0)) ){
-            ArrayList<String> updateAuthors = (ArrayList<String>) oldMetrics.getAuthors();
+        if ( !oldMetric.getAuthors().contains(this.authors.get(0)) ){
+            ArrayList<String> updateAuthors = (ArrayList<String>) oldMetric.getAuthors();
             updateAuthors.add( this.authors.get(0) );
             this.authors = updateAuthors;
-        } else { this.authors = (ArrayList<String>) oldMetrics.getAuthors(); }
-        this.churn += oldMetrics.getChurn();
-        this.locTouched += oldMetrics.getLocTouched();
+        } else { this.authors = (ArrayList<String>) oldMetric.getAuthors(); }
+        this.churn += oldMetric.getChurn();
+        this.locTouched += oldMetric.getLocTouched();
         // Sum up all loc ADDED within the release.
-        this.avgLocAdded += oldMetrics.getAvgLocAdded();
+        this.avgLocAdded += oldMetric.getAvgLocAdded();
         // Get the oldest version of this file within the release.
-        if ( oldMetrics.getAge() > this.age){
-            this.age = oldMetrics.getAge();
+        if ( oldMetric.getAge() > this.age){
+            this.age = oldMetric.getAge();
         }
         // Sum up all loc reported for this file over all commits within the release.
-        this.loc += oldMetrics.getLoc();
+        this.loc += oldMetric.getLoc();
         // Update MAX loc ADDED only if it is greater than the max loc added reached by previous commits within the release.
-        if ( this.maxLocAdded <= oldMetrics.getMaxLocAdded()){
-            this.maxLocAdded = oldMetrics.getMaxLocAdded();
+        if ( this.maxLocAdded <= oldMetric.getMaxLocAdded()){
+            this.maxLocAdded = oldMetric.getMaxLocAdded();
         }
         // Sum up all CHANGE SET SIZE over commits within the release.
-        this.avgChangeSet += oldMetrics.getAvgChangeSet();
+        this.avgChangeSet += oldMetric.getAvgChangeSet();
         // Update MAX CHANGE SET only if it is greater than the max chg set reached by previous commits within the release.
-        if (this.maxChangeSet <= oldMetrics.getMaxChangeSet()){
-            this.maxChangeSet = oldMetrics.getMaxChangeSet();
+        if (this.maxChangeSet <= oldMetric.getMaxChangeSet()){
+            this.maxChangeSet = oldMetric.getMaxChangeSet();
         }
         // Sum up all loc reported for this file over all commits within the release.
-        this.numImports += oldMetrics.getNumImports();
+        this.numImports += oldMetric.getNumImports();
         // Sum up all loc reported for this file over all commits within the release.
-        this.numComments += oldMetrics.getNumComments();
+        this.numComments += oldMetric.getNumComments();
 
     }
 

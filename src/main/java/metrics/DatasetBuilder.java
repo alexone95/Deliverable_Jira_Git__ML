@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import com.google.common.collect.Multimap;
 import model.*;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
@@ -38,30 +37,30 @@ public class DatasetBuilder {
         for ( Issue issue : issues ){
             for ( CommitDetails commit : issue.getCommits() ){
                 for ( CommitFileDetails file : commit.getFilesChanged() ){
-                    Metrics newMetrics = new Metrics();
+                    Metric newMetric = new Metric();
                     version = commit.getVersion();
                     filepath = file.getModifiedFileName();
-                    newMetrics.setVersion(version);
-                    newMetrics.setFilepath(filepath);
-                    newMetrics.setNr( 1 );
-                    newMetrics.setAge( file.getAge());
-                    newMetrics.setChurn(file.getChurn());
-                    newMetrics.appendAuthor(commit.getPerson().getName());
-                    newMetrics.setLocTouched(file.getLocTouched());
-                    newMetrics.setMaxLocAdded(file.getAddedLOC());
-                    newMetrics.setLoc((int) file.getLoc());
-                    newMetrics.setAvgLocAdded(file.getAddedLOC());
-                    newMetrics.setAvgChangeSet(commit.getFilesChanged().size());
-                    newMetrics.setMaxChangeSet(commit.getFilesChanged().size());
-                    newMetrics.setNumImports(file.getNumImports());
-                    newMetrics.setNumComments(file.getNumComments());
-                    newMetrics.setBuggyness(String.valueOf(file.isBuggy()));
+                    newMetric.setVersion(version);
+                    newMetric.setFilepath(filepath);
+                    newMetric.setNr( 1 );
+                    newMetric.setAge( file.getAge());
+                    newMetric.setChurn(file.getChurn());
+                    newMetric.appendAuthor(commit.getPerson().getName());
+                    newMetric.setLocTouched(file.getLocTouched());
+                    newMetric.setMaxLocAdded(file.getAddedLOC());
+                    newMetric.setLoc((int) file.getLoc());
+                    newMetric.setAvgLocAdded(file.getAddedLOC());
+                    newMetric.setAvgChangeSet(commit.getFilesChanged().size());
+                    newMetric.setMaxChangeSet(commit.getFilesChanged().size());
+                    newMetric.setNumImports(file.getNumImports());
+                    newMetric.setNumComments(file.getNumComments());
+                    newMetric.setBuggyness(String.valueOf(file.isBuggy()));
                     if( !fileDataset.containsKey(version,filepath) ){
-                        fileDataset.put( version, filepath, newMetrics );
+                        fileDataset.put( version, filepath, newMetric);
                     } else{
-                        Metrics oldMetrics = ( Metrics ) fileDataset.get( version, filepath );
-                        newMetrics.update( oldMetrics );
-                        fileDataset.put( version, filepath, newMetrics );
+                        Metric oldMetric = (Metric) fileDataset.get( version, filepath );
+                        newMetric.update(oldMetric);
+                        fileDataset.put( version, filepath, newMetric);
                     }
                 }
             }
@@ -126,7 +125,7 @@ public class DatasetBuilder {
             csvWriter.append("\n");
 
             // The following Tree Map is used to insert dataset entries in the csv following the correct order (by version).
-            Map<String, Metrics> orderedMap = new TreeMap<>();
+            Map<String, Metric> orderedMap = new TreeMap<>();
             var dataSetIterator = fileDataset.mapIterator();
 
             // Iterate over the dataset
@@ -138,32 +137,32 @@ public class DatasetBuilder {
                 if ( version <= lastVersion + 1 ){
                     String revisedKey = String.valueOf( version );
                     if ( revisedKey.length() == 1 ){ revisedKey = "0" + revisedKey; }
-                    Metrics metrics = (Metrics) fileDataset.get(key.getKey(0), key.getKey(1));
+                    Metric metric = (Metric) fileDataset.get(key.getKey(0), key.getKey(1));
 
-                    orderedMap.put( revisedKey + "," + (String)key.getKey(1), metrics );
+                    orderedMap.put( revisedKey + "," + (String)key.getKey(1), metric);
                 }
             }
 
-            for ( Map.Entry<String, Metrics> entry : orderedMap.entrySet() ) {
+            for ( Map.Entry<String, Metric> entry : orderedMap.entrySet() ) {
 
-                Metrics metrics = entry.getValue();
+                Metric metric = entry.getValue();
                 // Check that the version index is contained in the first half of the releases
-                    int nr = metrics.getNr();
-                    String nAuth = Integer.toString(metrics.getAuthors().size());
-                    String loc = Integer.toString(metrics.getLoc()/nr);
-                    String age = Integer.toString(metrics.getAge());
-                    String churn = Integer.toString(metrics.getChurn());
-                    String locTouched = Integer.toString(metrics.getLocTouched());
-                    String avgLocAdded = Integer.toString( ( metrics.getAvgLocAdded()/nr ) );
-                    String maxLocAdded = Integer.toString(metrics.getMaxLocAdded());
-                    String avgChgSet = Integer.toString(metrics.getAvgChangeSet()/nr);
-                    String maxChgSet = Integer.toString(metrics.getMaxChangeSet());
-                    String numImports = Integer.toString(metrics.getNumImports());
-                    String numComments = Integer.toString(metrics.getNumComments());
-                    String buggy = metrics.getBuggyness().equals("true") ? "Yes" : "No";
+                    int nr = metric.getNr();
+                    String nAuth = Integer.toString(metric.getAuthors().size());
+                    String loc = Integer.toString(metric.getLoc()/nr);
+                    String age = Integer.toString(metric.getAge());
+                    String churn = Integer.toString(metric.getChurn());
+                    String locTouched = Integer.toString(metric.getLocTouched());
+                    String avgLocAdded = Integer.toString( ( metric.getAvgLocAdded()/nr ) );
+                    String maxLocAdded = Integer.toString(metric.getMaxLocAdded());
+                    String avgChgSet = Integer.toString(metric.getAvgChangeSet()/nr);
+                    String maxChgSet = Integer.toString(metric.getMaxChangeSet());
+                    String numImports = Integer.toString(metric.getNumImports());
+                    String numComments = Integer.toString(metric.getNumComments());
+                    String buggy = metric.getBuggyness().equals("true") ? "Yes" : "No";
 
                     // Append the data
-                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metrics.getNr() + "," + nAuth + ","
+                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metric.getNr() + "," + nAuth + ","
                             + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
                             + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numComments + "," +  buggy);
 
