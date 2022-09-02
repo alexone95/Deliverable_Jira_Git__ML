@@ -46,8 +46,11 @@ public class CommitDetails {
     }
 
     public void setAddedLoc() {
-        for( CommitFileDetails commitFileDetails: this.filesChanged){
-            this.addedLoc += commitFileDetails.getAddedLOC();
+        this.addedLoc = 0;
+        if (this.filesChanged != null) {
+            for (CommitFileDetails commitFileDetails : this.filesChanged) {
+                this.addedLoc += commitFileDetails.getAddedLOC();
+            }
         }
     }
 
@@ -56,8 +59,11 @@ public class CommitDetails {
     }
 
     public void setDeletedLoc() {
-        for( CommitFileDetails commitFileDetails: this.filesChanged){
-            this.deletedLoc += commitFileDetails.getDeletedLOC();
+        this.deletedLoc = 0;
+        if (this.filesChanged != null) {
+            for (CommitFileDetails commitFileDetails : this.filesChanged) {
+                this.deletedLoc += commitFileDetails.getDeletedLOC();
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package main;
 
 import classifier.Classifier;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import jgit_utilities.GitSearcher;
 import me.tongfei.progressbar.ProgressBar;
@@ -11,14 +12,14 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.common.collect.Multimap;
-import utils.Utils;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,7 +27,7 @@ import static utils.Utils.fillAffectedVersionList;
 
 public class RetrieveTicketsID {
 
-    public static final String PROJECT_NAME ="STORM";
+    public static final String PROJECT_NAME = "OPENJPA";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
     private static final List<Issue> list_of_issues_with_AV = new ArrayList<>();
@@ -57,22 +58,20 @@ public class RetrieveTicketsID {
         }
     }
 
-    /* This Method performs a rest API to Jira querying for all versions with related dates for the
-    specified software project. */
+    /* Effettua la query in GET per il retrieve dei ticket da Jira e prende l'array delle versioni */
     public static void getVersionsWithReleaseDate() throws IOException, JSONException {
 
         String releaseName;
         Integer i;
 
-        // Url for the GET request to get information associated to Jira project
         String url = "https://issues.apache.org/jira/rest/api/2/project/" + PROJECT_NAME;
 
         JSONObject json = readJsonFromUrl( url );
 
-        // Get the JSONArray associated to project version
         JSONArray versions = json.getJSONArray( "versions" );
 
-        // For each version check if version has release date and name, and add it to relative list
+        // Per ogni versione controlla se questa abbia una release date e un nome e la aggiunge alla
+        // mappa (LocalDate,String) @version_map
         for ( i = 0; i < versions.length(); i++ ) {
             if ( versions.getJSONObject(i).has( RELEASE_DATE ) && versions.getJSONObject(i).has("name") ) {
                 releaseName = versions.getJSONObject(i).get("name").toString();
@@ -80,7 +79,7 @@ public class RetrieveTicketsID {
             }
         }
 
-        // Give an index to each release in the list
+        // Assegna un indice intero ad ogni release nella lista in modo da poter essere utilizzato in seguito
         int releaseNumber = 1;
         for ( LocalDate k : version_map.keySet() ) {
             version_map.put(k, String.valueOf( releaseNumber ));
@@ -90,16 +89,17 @@ public class RetrieveTicketsID {
         datasetBuilder = new DatasetBuilder( version_map , PROJECT_NAME);
     }
 
-    /* This Method takes the JSON Array containing all affected versions specified for the ticket
-    and returns a String ArrayList containing only those having an associated release date. */
+
     public static List<String> getJsonAffectedVersionList(JSONArray avArray) throws JSONException {
+        /*
+            Questo metodo va a prendere tutte le affected version associate al ticket tale per cui sia associata
+            una releaseDate, e ritorna la lista di AV relative al quel task
+        */
         ArrayList<String> affectedVersions = new ArrayList<>();
         if ( avArray.length() > 0 ) {
-            // For each release in the AV version
             for (int k = 0; k < avArray.length(); k++) {
                 JSONObject singleRelease = avArray.getJSONObject(k);
-                // Check if the single release has been released
-                if ( singleRelease.has( RELEASE_DATE ) ) {
+                if (singleRelease.has(RELEASE_DATE)) {
                     affectedVersions.add(singleRelease.getString("name"));
                 }
             }
@@ -109,16 +109,14 @@ public class RetrieveTicketsID {
 
 
     public static void getTickets() throws IOException, JSONException {
-
+        /*
+            Questo metodo va ad effettuare la query verso Jira facendo il retrieve dei ticket
+        */
         Integer j = 0;
         Integer i = 0;
         Integer total = 1;
 
-        // Get JSON API for closed bugs w/ AV in the project
-
         do {
-            // Only gets a max of 1000 at a time, so must do this multiple times if bugs > 1000
-
             j = i + 1000;
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22" + PROJECT_NAME
                     + "%22AND%22issueType%22=%22Bug%22AND(%22status%22=%22closed%22OR"
@@ -128,8 +126,9 @@ public class RetrieveTicketsID {
             JSONObject json = readJsonFromUrl(url);
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
+            //total = 200;
 
-            // For each closed ticket get the key of the ticket
+            // Per ogni ticket chiuso o risolto di tipo bug vado a prendere la chiave
             for (; i < total && i < j; i++) {
 
                 String key = ( issues.getJSONObject(i % 1000).get("key").toString() ).split("-")[1];
@@ -140,10 +139,8 @@ public class RetrieveTicketsID {
 
                 String creationDate = currentIssue.getString("created").split("T")[0];
 
-                // get JSONArray associated to the affected versions.
+                // Prende il JSONArray associato alle affected version
                 JSONArray avArray = currentIssue.getJSONArray("versions");
-
-                // Get a List from the JSONArray with only dated affected versions.
                 List<String> avList = getJsonAffectedVersionList( avArray );
 
                 Issue issue = new Issue( key, resolutionDate, creationDate, avList);
@@ -156,7 +153,12 @@ public class RetrieveTicketsID {
     }
 
     public static void getCommits() throws IOException, JSONException, GitAPIException {
-        ProgressBar pb = new ProgressBar("SCANNING TICKET", list_of_issues.size()); // name, initial max
+        /*
+            Questo metodo scorre la lista delle issue e va a fare il retrieve di tutte le grandezze necessarie a
+            calcolare le metode e aggiunge la lista dei commit alle Issue relative
+        */
+
+        ProgressBar pb = new ProgressBar("SCANNING TICKET", list_of_issues.size());
         pb.start();
         for(Issue issue : list_of_issues){
             pb.step();
@@ -168,7 +170,7 @@ public class RetrieveTicketsID {
     }
 
     public static double average( List<Double> array ){
-        double avg = 0.0;
+        double avg;
         double sum = 0.0;
         for ( double p : array ){
             sum += p;
@@ -177,17 +179,22 @@ public class RetrieveTicketsID {
         return avg;
     }
 
-    /* This Method is used in order to set Opening and Fixed Versions for every issue
-    that has been retrieved. Actually, those informations are stored into the issue object's
-    state as Integer values (in the shape of version's indexes). */
     public static void setOpeningAndFixedVersions(){
+        /*
+            Va ad impostare la fix version e la opening version sottoforma di indici interi e salvata all'interno
+            dell'oggetto issue. Per la fixversion andiamo ad utilizzare la resolution date, mentre per quanto riguarda
+            la opening version andiamo ad utilizzare la creation date.
+        */
         for ( Issue issue : list_of_issues ){
+            // Fix Version
             for( LocalDate date : version_map.keySet()){
                 issue.setFixVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
                 if ( date.isEqual( LocalDate.parse( issue.getResolutionDate() ) ) || date.isAfter( LocalDate.parse(issue.getResolutionDate()) ) ){
                     break;
                 }
             }
+
+            // Opening Version
             for( LocalDate date : version_map.keySet()){
                 issue.setOpeningVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
                 if ( date.isEqual( LocalDate.parse( issue.getCreationDate() ) ) || date.isAfter( LocalDate.parse(issue.getCreationDate()) ) ){
@@ -197,28 +204,30 @@ public class RetrieveTicketsID {
         }
     }
 
-    /* This Method is used in order to set the Affected Versions indexes for every issue
-    that has been retrieved and that maintains the AVs information.
-    Furthermore, issues with declared AVs are separated from those without them, so that
-    it will be possible to handle the two groups of issues separately. */
+
     public static void setAffectedVersionsAV(){
+        /*
+            Va ad impostare le affected versions come indice per ogni issue che abbia l'informazione indicata in Jira.
+            Vengono inoltre popolate due liste separate di issue che hanno e non hanno delle AV indicate.
+        */
         for ( Issue issue : list_of_issues ){
-            // If the current issue has not specified AVs it'll be appended to the array
-            // that will be used to perform the Proportion Method.
             if ( issue.getAffectedVersion().isEmpty() ){
                 list_of_issues_without_AV.add( issue );
             }
             else{
+                // AV in questo caso è indicata
                 ArrayList<Integer> avs = new ArrayList<>();
                 List<String> affectedVersions = issue.getAffectedVersion();
                 avs = (ArrayList<Integer>) fillAffectedVersionList(affectedVersions, version_map);
-                // Check if the reported affected versions for the current issue are not coherent
-                // with the reported fixed version ( i.e. av > fv ).
+
+                // Controlliamo che la affected version sia coerente, ovvero che non sia >= della fix version
                 avs.removeIf( av -> av >= issue.getFixVersion());
                 if ( avs.isEmpty() ) {
                     list_of_issues_without_AV.add( issue );
                 }
                 else{
+                    // Se quindi sopravvive al controllo di cui sopra andiamo ad aggiungere l'issue alla lista di quelle
+                    // che hanno una AV oltre ad assegnarla all'oggetto issue
                     int minValue = Collections.min( avs );
                     int maxValue = ( issue.getFixVersion() - 1 );
                     avs = new ArrayList<>( IntStream.rangeClosed(minValue, maxValue).boxed().collect(Collectors.toList()) );
@@ -229,10 +238,10 @@ public class RetrieveTicketsID {
         }
     }
 
-
-    /* This Method is used to set the Injected version of every issue having declared affected
-    versions. The injected version is set as the minimum between all declared affected versions. */
     public static void setInjectedVersionAV(){
+        /*
+            La injected version viene impostata come il minimo tra tutte le affected version dichiarate nella issue
+        */
         int iv;
         for ( Issue issue : list_of_issues_with_AV ){
             iv = Collections.min( issue.getAffectedVersionIndex());
@@ -241,6 +250,10 @@ public class RetrieveTicketsID {
     }
 
     public static void computeProportionIncremental(List<Issue> issues){
+        /*
+            Effettua il calcolo della proportion, nello specifico andando ad indicare P come la media delle
+            versioni precedenti.
+        */
         ArrayList<Double> proportions = new ArrayList<>();
         for ( Issue issue : issues ){
             if ( issue.getOpeningVersion() != issue.getFixVersion()) {
@@ -255,6 +268,10 @@ public class RetrieveTicketsID {
     }
 
     public static void setAffectedAndInjectedVersionsP(List<Issue> issues){
+        /*
+            Andiamo ad assegnare la affected e la injected version stimata sfruttando il valore di P precedentemente
+            calcolato su tutte le issue.
+        */
         for ( Issue issue : issues ){
             int fv = issue.getFixVersion();
             int ov = issue.getOpeningVersion();
@@ -270,15 +287,15 @@ public class RetrieveTicketsID {
         }
     }
 
-    /* This Method is used to clean the issues array from all issue tickets that have no related commits. */
     public static void removeIssuesWithoutCommits(){
         list_of_issues.removeIf( issue -> issue.getCommits().isEmpty() );
     }
 
 
-    /* This Method is called by Commit Objects in order to retrieve their own version
-    using the value of the commit local date. */
     public static int getVersionFromLocalDate( LocalDate localDate ){
+        /*
+            Questo metodo è utilizzato dai Commit per ricavare la loro versione attraverso la commitDate
+        */
         int version = -1;
         for( LocalDate date : version_map.keySet()){
             version = Integer.parseInt( Iterables.getLast( version_map.get(date) ));
@@ -320,8 +337,6 @@ public class RetrieveTicketsID {
             removeIssuesWithoutCommits();
 
             populateDatasetMapAndWriteToCSV();
-
-            Utils.printFullInfoFromTicket(list_of_issues);
         }
 
         Classifier.train();

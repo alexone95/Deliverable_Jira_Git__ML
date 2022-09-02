@@ -2,6 +2,9 @@ package utils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import model.CommitDetails;
+import model.CommitFileDetails;
+import model.Issue;
 import org.eclipse.jgit.diff.Edit;
 import weka.attributeSelection.CfsSubsetEval;
 import weka.attributeSelection.GreedyStepwise;
@@ -15,7 +18,6 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.supervised.instance.Resample;
-import weka.filters.supervised.instance.SMOTE;
 import weka.filters.supervised.instance.SpreadSubsample;
 
 import java.io.*;
@@ -24,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import model.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -42,6 +44,7 @@ public class Utils {
     private static final String SMOTE = "Smote";
     private static final String NO_SAMPLING = "No sampling";
 
+    /* Metodo per la stampa di caratteristiche dei file */
     public static void printFilesInfoprintFilesInfo(List<CommitFileDetails> commitFileDetailsList){
         for(CommitFileDetails commitFileDetails : commitFileDetailsList){
             LOGGER.info("\n");
@@ -53,6 +56,7 @@ public class Utils {
         }
     }
 
+    /* Metodo per la stampa della lista delle issue */
     public static void printTicketList(List<Issue> issues){
         for(Issue commitIssue : issues){
             LOGGER.info("\n " + commitIssue.getIssueKey());
@@ -69,6 +73,7 @@ public class Utils {
         }
     }
 
+    /* Metodo per la stampa dei dettagli delle commit */
     public static void printCommitDetailsFromTicket(List<Issue> issues){
         for(Issue commitIssue : issues){
             LOGGER.info("\n");
@@ -82,6 +87,7 @@ public class Utils {
         }
     }
 
+    /* Metodo per la stampa della lista delle issue */
     public static void printFullInfoFromTicket(List<Issue> issues){
         for(Issue commitIssue : issues){
             LOGGER.info("\n");
@@ -107,8 +113,8 @@ public class Utils {
         }
     }
 
+    /* Funzione utilizzata per contare le righe di codice di un file .java */
     public static long countLineBufferedReader(String fileText) {
-
         long lines = 0;
         String line= "";
         try (BufferedReader reader = new BufferedReader(new StringReader(fileText))) {
@@ -123,9 +129,11 @@ public class Utils {
 
     }
 
+    /*
+        Questo metodo è di appoggio alla creazione del file ARFF
+    */
     public static int appendToCSV(FileWriter csvWriter, String line) throws IOException {
         int counterDefective = 0;
-        // Append the row readed from the CSV file, but without the first 2 column
         String[] array = line.split(",");
         for (int i = 2; i < array.length; i++) {
             if (i == array.length - 1) {
@@ -140,8 +148,9 @@ public class Utils {
         return counterDefective;
     }
 
-    /** Apply the walk forward technique to build training set building the arff
-     */
+    /*
+        Applica la tecnica di walk forward per la costruzione del training set, costruendo l'ARFF
+    */
     public static List<Integer> walkForwardTraining(String projectName, int trainingLimit) throws IOException {
 
         int counterElement = 0;
@@ -149,10 +158,9 @@ public class Utils {
 
         ArrayList<Integer> counterList = new ArrayList<>();
 
-        // Create the output ARFF file
+        // Creazione del file ARFF necessario alla classificazione
         try (FileWriter csvWriter = new FileWriter(projectName + TRAINING)) {
 
-            // Append the static line of the ARFF file
             csvWriter.append("@relation " + projectName + "\n\n");
             csvWriter.append("@attribute NumberRevisions real\n");
             csvWriter.append("@attribute NumberAuthors real\n");
@@ -165,29 +173,27 @@ public class Utils {
             csvWriter.append("@attribute AvgChgSet real\n");
             csvWriter.append("@attribute MaxChgSet real\n");
             csvWriter.append("@attribute numImports real\n");
-            csvWriter.append("@attribute numComments real\n");
+            csvWriter.append("@attribute numPublicAttributesOrMethods real\n");
             csvWriter.append("@attribute Buggy {Yes, No}\n\n");
             csvWriter.append("@data\n");
 
-            // Read the project dataset
+            // Apriamo il dataset CSV creato nella
             try (BufferedReader br = new BufferedReader(new FileReader("src/csv_output/" + projectName + "_dataset.csv"))){
 
-                // Skip the first line (contains just column name)
+                // Skip della prima riga essendo che contiene le intestazioni
                 String line = br.readLine();
 
-                // Read till the last row
+                // Legge fino all'ultima riga
                 while ((line = br.readLine()) != null){
 
-                    // Check if the version number is contained in the limit index
+                    // Controlla se la versione è inferiore al limite imposto (metà delle versioni)
                     if (Integer.parseInt(line.split(",")[0]) <= trainingLimit ) {
-
                         counterElement = counterElement + 1;
 
                         counterDefective = counterDefective + appendToCSV(csvWriter, line);
                     }
                 }
 
-                // Flush the file to the disk
                 csvWriter.flush();
 
                 counterList.add(counterElement);
@@ -199,17 +205,17 @@ public class Utils {
         }
     }
 
-    /** Apply the walk forward technique to build testing set building the arff
-     */
+    /*
+        Applica la tecnica di walk forward per la costruzione del testing set, costruendo l'ARFF
+    */
     public static List<Integer> walkForwardTesting(String projectName, int testing) throws IOException, NoVersionException {
 
         int counterElement = 0;
         int counterDefective = 0;
         ArrayList<Integer> counterList = new ArrayList<>();
-        // Create the output ARFF file
+
         try (FileWriter csvWriter = new FileWriter(projectName + TESTING)) {
 
-            // Append the static line of the ARFF file
             csvWriter.append("@relation " + projectName + "\n\n");
             csvWriter.append("@attribute NumberRevisions real\n");
             csvWriter.append("@attribute NumberAuthors real\n");
@@ -222,31 +228,26 @@ public class Utils {
             csvWriter.append("@attribute AvgChgSet real\n");
             csvWriter.append("@attribute MaxChgSet real\n");
             csvWriter.append("@attribute numImports real\n");
-            csvWriter.append("@attribute numComments real\n");
+            csvWriter.append("@attribute numPublicAttributesOrMethods real\n");
             csvWriter.append("@attribute Buggy {Yes, No}\n\n");
             csvWriter.append("@data\n");
 
-            // Read the project dataset
             try (BufferedReader br = new BufferedReader(new FileReader("src/csv_output/" + projectName + "_dataset.csv"))){
 
-                // Skip the first line (contains just column name)
                 String line = br.readLine();
 
-                // Read till the last row
                 while ((line = br.readLine()) != null){
 
-                    // Check if the version number is equal to the one equal to the test index
                     if (Integer.parseInt(line.split(",")[0]) == testing ) {
 
                         counterElement = counterElement + 1;
 
-                        // Append the row readed from the CSV file, but without the first 2 column
                         counterDefective = counterDefective + appendToCSV(csvWriter, line);
                     }
                 }
 
-                // Flush the file to the disk
                 csvWriter.flush();
+
                 counterList.add(counterElement);
                 counterList.add(counterDefective);
 
@@ -260,11 +261,13 @@ public class Utils {
         return counterList;
     }
 
+    /* Questo metodo ritorna una stringa contenente le rilevazioni prese dall'evaluator */
     public static String retrieveMetrics(Evaluation eval, String classifier, String balancing, String featureSelection) {
 
         return classifier + "," + balancing + "," + featureSelection + "," + eval.truePositiveRate(1)  + "," + eval.falsePositiveRate(1)  + "," + eval.trueNegativeRate(1)  + "," + eval.falseNegativeRate(1)  + "," + eval.precision(1)  + "," + eval.recall(1)  + "," + eval.areaUnderROC(1)  + "," + eval.kappa() + "\n";
     }
 
+    /* Questo metodo ritorna il numero di imports in un file .java */
     public static int getNumImports( String fileText ){
         int numImports = 0;
         try ( BufferedReader reader = new BufferedReader(new StringReader(fileText)) ) {
@@ -279,25 +282,60 @@ public class Utils {
         return numImports;
     }
 
-    public static int getNumComments( String fileText ){
-        int numComments = 0;
-        try ( BufferedReader reader = new BufferedReader(new StringReader(fileText)) ) {
-            for ( String line = reader.readLine(); line != null; line = reader.readLine()) {
-                if( line.contains( "//" ) || line.contains( "/*" ) || line.contains( "*/" )|| line.contains( "*" )){
-                    numComments ++;
+    /* Questo metodo ritorna il numero di attributi pubblici in un file .java */
+    public static int getPublicAttributesOrMethods(String fileText){
+        int numPublicAttributesOrMethods = 0;
+        String regex = "\\bpublic\\b"; //regex che vada a prendere la singola parola public
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher;
+        try (BufferedReader reader = new BufferedReader(new StringReader(fileText))) {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                matcher = pattern.matcher(line);
+                if(matcher.find()){
+                    numPublicAttributesOrMethods ++;
                 }
             }
-        } catch ( IOException e ) {
+        } catch (IOException e) {
             return 0;
         }
-        return numComments;
+        return numPublicAttributesOrMethods;
     }
 
+    /* Funzione d'utility per discriminare le variazioni di righe nei commit */
+    public static String modifiedLocRetrieverMode(Edit edit){
+        if (edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB()){
+            return "REPLACED";
+        }
+        if (edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB()){
+            return "DELETED";
+        }
+        if (edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB()){
+            return "ADDED";
+        }
+        return "";
+    }
 
-    /** Feature selection */
+    /* Funzione che determina la bugginess */
+    public static boolean retrieveBugginess(int commitVersion, int fixVersion, int injectedVersion){
+        return (commitVersion < fixVersion) && (commitVersion >= injectedVersion);
+    }
+
+    public static List<Integer> fillAffectedVersionList(List<String> affectedVersions, Multimap<LocalDate, String> versionMap){
+        ArrayList<Integer> avs = new ArrayList<>();
+        for ( String version : affectedVersions ){
+            for( LocalDate date : versionMap.keySet() ){
+                if ( Iterables.get(versionMap.get(date),0).equals( version )){
+                    avs.add( Integer.valueOf( Iterables.getLast( versionMap.get(date) )) );
+                    break;
+                }
+            }
+        }
+        return avs;
+    }
+
+    /* Funzione che applica la feature selection */
     public static List<String> applyFeatureSelection(Instances training, Instances testing, double percentageMajorityClass) throws Exception {
 
-        // Create filter
         AttributeSelection filter = new AttributeSelection();
         CfsSubsetEval eval = new CfsSubsetEval();
         GreedyStepwise search = new GreedyStepwise();
@@ -306,31 +344,28 @@ public class Utils {
         filter.setSearch(search);
 
         filter.setInputFormat(training);
-        // Apply the filter to the training set
+        // Applica il filtro al training set
         Instances filteredTraining =  Filter.useFilter(training, filter);
-        // Apply the filter to the test set
+        // Applica il filtro al testing set
         Instances testingFiltered = Filter.useFilter(testing, filter);
         int numAttrFiltered = filteredTraining.numAttributes();
         filteredTraining.setClassIndex(numAttrFiltered - 1);
         testingFiltered.setClassIndex(numAttrFiltered - 1);
 
-        // Apply sampling to evaluate over filtered dataset
+        // Applica il sampling sul database filtrato
         return applySampling(filteredTraining, testingFiltered, percentageMajorityClass, "True");
-
 
     }
 
 
-    /** This function build the ARFF file relative to the dataset
-     */
     public static void addResult(Evaluation eval, List<String> result, String classifierAbb, String sampling, String featureSelection) {
-
         result.add(retrieveMetrics(eval,classifierAbb, sampling, featureSelection));
 
     }
 
-    /** This function build apply the specified filter with the sampling technique to the evaluator
-     */
+    /*
+        Applica il filtro relativo al sampling (OVER, UNDER, NO SAMPLING)
+    */
     public static Evaluation applyFilterForSampling(FilteredClassifier fc, Evaluation eval, Instances training, Instances testing, AbstractClassifier classifierName) {
 
         try {
@@ -349,8 +384,9 @@ public class Utils {
         return eval;
     }
 
-    /** Apply sampling to filtered dataset with classifier (IBK, RF, NB) and evaluate
-     */
+    /*
+        Applica il sampling ai tre classificatori e ne effettua l'evaluate
+    */
     public static List<String> applySampling(Instances training, Instances testing, double percentageMajorityClass, String featureSelection) throws Exception {
 
         ArrayList<String> result = new ArrayList<>();
@@ -363,13 +399,11 @@ public class Utils {
         training.setClassIndex(numAttrNoFilter - 1);
         testing.setClassIndex(numAttrNoFilter - 1);
 
-        // Build the classifier
         classifierNB.buildClassifier(training);
         classifierRF.buildClassifier(training);
         classifierIBk.buildClassifier(training);
-        // Get an evaluation object
 
-        // Evaluate with no sampling e no feature selection
+        // Valutazione del sistema senza feature selection e senza sampling
         Evaluation eval;
         eval = new Evaluation(training);
         addResult(applyFilterForSampling(null, eval, training, testing, classifierRF), result, "RF", NO_SAMPLING, featureSelection);
@@ -380,7 +414,7 @@ public class Utils {
         eval = new Evaluation(training);
         addResult(applyFilterForSampling(null, eval, training, testing, classifierNB), result, "NB", NO_SAMPLING, featureSelection);
 
-        // Apply undersampling
+        // Applica l'undersampling
         FilteredClassifier fc = new FilteredClassifier();
         SpreadSubsample underSampling = new SpreadSubsample();
         underSampling.setInputFormat(training);
@@ -397,7 +431,7 @@ public class Utils {
         eval = new Evaluation(training);
         addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", UNDER_SAMPLING, featureSelection);
 
-        // Apply oversampling
+        // Applica l'oversampling
         fc = new FilteredClassifier();
         Resample overSampling = new Resample();
         overSampling.setInputFormat(training);
@@ -414,13 +448,7 @@ public class Utils {
         eval = new Evaluation(testing);
         addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", OVER_SAMPLING, featureSelection);
 
-        // Apply SMOTE
-        weka.filters.supervised.instance.SMOTE smote = new SMOTE();
-        fc = new FilteredClassifier();
-        smote.setInputFormat(training);
-        fc.setFilter(smote);
-
-        // Evaluate the three classifiers
+        // Applica SMOTE
         eval = new Evaluation(testing);
         addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", SMOTE, featureSelection);
 
@@ -431,38 +459,6 @@ public class Utils {
         addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", SMOTE, featureSelection);
 
         return result;
-
-
-    }
-
-    public static String modifiedLocRetrieverMode( Edit edit){
-        if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-            return "REPLACED";
-        }
-        if ( edit.getBeginA() < edit.getEndA() && edit.getBeginB() == edit.getEndB() ){
-            return "DELETED";
-        }
-        if ( edit.getBeginA() == edit.getEndA() && edit.getBeginB() < edit.getEndB() ){
-            return "ADDED";
-        }
-        return "";
-    }
-
-    public static boolean retrieveBugginess(int commitVersion, int fixVersion, int injectedVersion){
-        return (commitVersion < fixVersion) && (commitVersion >= injectedVersion);
-    }
-
-    public static List<Integer> fillAffectedVersionList(List<String> affectedVersions, Multimap<LocalDate, String> versionMap){
-        ArrayList<Integer> avs = new ArrayList<>();
-        for ( String version : affectedVersions ){
-            for( LocalDate date : versionMap.keySet() ){
-                if ( Iterables.get(versionMap.get(date),0).equals( version )){
-                    avs.add( Integer.valueOf( Iterables.getLast( versionMap.get(date) )) );
-                    break;
-                }
-            }
-        }
-        return avs;
     }
 
 }

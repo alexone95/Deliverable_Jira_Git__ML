@@ -37,6 +37,10 @@ public class GitSearcher {
     }
 
     public static int getFileAge(RevCommit startCommit, String filename) throws IOException {
+        /*
+            Funzione che ricava l'age di un file a partire da un commit e da un @filename. Ritorna quindi l'age
+            del file calcolato in settimane
+        */
         Date dateFirstCommit;
         Date dateCurrentCommit;
         int age;
@@ -58,19 +62,24 @@ public class GitSearcher {
     }
 
     public static Repository openJGitRepository() throws IOException{
+        // Funzione necessaria per l'accesso a git della libreria JGit
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         String repopathF;
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
             repopathF = br.readLine();
         }
         return builder.setGitDir(new File(repopathF))
-                .readEnvironment() // scan environment GIT_* variables
-                .findGitDir() // scan up the file system tree
+                .readEnvironment()
+                .findGitDir()
                 .build();
     }
 
     public static List<CommitDetails> getAllCommitDetails(Repository repository, String filterParam, Issue issue)
             throws IOException, GitAPIException {
+        /*
+            Questa funzione effettua la logWalk andando a ricercare tra i commit quelli che nel commit message
+            hanno l'ID preso attraverso issue (@filterParam).
+        */
         Collection<Ref> allRefs = repository.getAllRefs().values();
         List<CommitDetails> listOfCommits = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -85,6 +94,10 @@ public class GitSearcher {
             for( RevCommit commit : revWalk ) {
                 LocalDate commitLocalDate = commit.getCommitterIdent().getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 int version = RetrieveTicketsID.getVersionFromLocalDate( commitLocalDate );
+                /*
+                    Andiamo a considerare solamente i commit tali per cui abbiamo che la fixVersion indicata sul task
+                    di Jira è superiore a quella del commit
+                */
                 if ( issue.getFixVersion() >= version ) {
                     CommitDetails commitDetail = new CommitDetails();
                     commitDetail.setCommit(commit);
@@ -96,6 +109,7 @@ public class GitSearcher {
                     commitDetail.setFullMessage(commit.getFullMessage());
                     commitDetail.setCommitDate(formatter.format(commitDetail.getPerson().getWhen()));
 
+                    // Aggiungo le informazioni alla lista di commit relativi all'issue
                     listOfCommits.add(commitDetail);
                 }
             }
@@ -104,27 +118,41 @@ public class GitSearcher {
     }
 
 
-    public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue) throws IOException, GitAPIException {
+    public static List<CommitFileDetails> commitChanges(RevCommit commit, CommitDetails commitObject, Issue issue)
+            throws IOException, GitAPIException {
+        /*
+            Questa funzione effettua il retrieve di tutte le informazioni necessarie al computo delle metriche
+        */
         String fileExtension = ".java";
         String repopathF;
+
+        // Andiamo a leggere il file path.txt che contiene il path al file .git che vogliamo indicare
         try (BufferedReader br = new BufferedReader(new FileReader("path.txt"))) {
             repopathF = br.readLine();
         }
+
         Git git = Git.open(new File(repopathF));
         List<CommitFileDetails> changedFilesList = new ArrayList<>();
-        int linesAdded = 0;
-        int linesDeleted = 0;
-        int linesReplaced = 0;
+        int linesAdded;
+        int linesDeleted;
+        int linesReplaced;
 
         DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
         df.setRepository(openJGitRepository());
         df.setDiffComparator(RawTextComparator.DEFAULT);
         df.setDetectRenames(true);
 
-        final List<DiffEntry> diffs = git.diff()
-                .setOldTree(prepareTreeParser(openJGitRepository(), commit.getParent(0).getId().getName()))
-                .setNewTree(prepareTreeParser(openJGitRepository(), commit.getId().getName()))
-                .call();
+        final List<DiffEntry> diffs;
+
+        try {
+            diffs = git.diff()
+                    .setOldTree(prepareTreeParser(openJGitRepository(), commit.getParent(0).getId().getName()))
+                    .setNewTree(prepareTreeParser(openJGitRepository(), commit.getId().getName()))
+                    .call();
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            return null;
+        }
 
         for (DiffEntry diff : diffs) {
             String fileName = diff.getNewPath();
@@ -134,6 +162,7 @@ public class GitSearcher {
             if (!fileName.endsWith(fileExtension)) {
                 continue;
             }
+
             String fileText = getTextfromCommittedFile(commit, fileName);
 
             int age = getFileAge(commit, fileName);
@@ -149,14 +178,14 @@ public class GitSearcher {
 
             boolean buggy = Utils.retrieveBugginess(commitObject.getVersion(), issue.getFixVersion(), issue.getInjectedVersion());
             int numImports = Utils.getNumImports(fileText);
-            int numComments = Utils.getNumComments(fileText);
+            int numPublicAttributesOrMethods = Utils.getPublicAttributesOrMethods(fileText);
 
             CommitFileDetails commitFileDetails = new CommitFileDetails(fileName, linesAdded, linesDeleted, linesReplaced,
                     Utils.countLineBufferedReader(fileText), fileText, age);
 
             commitFileDetails.setBuggy(buggy);
             commitFileDetails.setNumImports(numImports);
-            commitFileDetails.setNumComments(numComments);
+            commitFileDetails.setNumPublicAttributerOrMethods(numPublicAttributesOrMethods);
 
             changedFilesList.add(commitFileDetails);
         }
@@ -165,7 +194,7 @@ public class GitSearcher {
     }
 
     private static AbstractTreeIterator prepareTreeParser(Repository repository, String objectId) throws IOException {
-        // from the commit we can build the tree which allows us to construct the TreeParser
+        // Funzione necessaria a ricavare le grandezze relative alle righe aggiunte, modificate ed eliminate nei commit
         try (RevWalk walk = new RevWalk(repository)) {
             RevCommit commit = walk.parseCommit(repository.resolve(objectId));
             RevTree tree = walk.parseTree(commit.getTree().getId());
@@ -181,11 +210,14 @@ public class GitSearcher {
     }
 
     public static String getTextfromCommittedFile(RevCommit commit, String filename) throws IOException {
+        /*
+            Funzione che effettua il retrieve del codice effettivo del file relativo a @commit.
+            Necessario per ricavare delle metriche
+        */
         RevTree tree = commit.getTree();
         Repository repository = openJGitRepository();
         String fileText;
 
-        // now try to find a specific file
         try (TreeWalk treeWalk = new TreeWalk(repository)) {
             treeWalk.addTree(tree);
             treeWalk.setRecursive(true);
@@ -201,7 +233,6 @@ public class GitSearcher {
             loader.copyTo(stream);
             fileText = stream.toString();
             return fileText;
-
         }
     }
 }

@@ -1,20 +1,23 @@
 package metrics;
 
+import com.google.common.collect.Multimap;
+import model.CommitDetails;
+import model.CommitFileDetails;
+import model.Issue;
+import org.apache.commons.collections4.map.LinkedMap;
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.google.common.collect.Multimap;
-import model.*;
-import org.apache.commons.collections4.map.LinkedMap;
-import org.apache.commons.collections4.map.MultiKeyMap;
-
 public class DatasetBuilder {
 
-    // Dataset as a MultiKeyMap with key :<version,filepath> and value <metrics>
+    // MultiKeyMap che costituisce il dataset con chiave :<versione,filepath> e valore <metriche>
     private MultiKeyMap<Object, Object> fileDataset = MultiKeyMap.multiKeyMap( new LinkedMap<>() );
 
     private Multimap<LocalDate,String> versionMap;
@@ -26,73 +29,81 @@ public class DatasetBuilder {
 
     public DatasetBuilder( Multimap<LocalDate,String> versionMap, String projectName){
         this.versionMap = versionMap;
-        this.lastVersion =  (versionMap.size() / 2) / 2;
+        this.lastVersion =  (versionMap.size()/2)/2;
         this.projectName = projectName;
     }
 
-    /*  This Method is used to populate the  Multi Key Map representing the dataset to be created. */
+    /*  Metodo utilizzato per popolare @fileDataset  */
     public void populateFileDataset( List<Issue> issues ){
         int     version;
         String  filepath;
+
+        // Costruisce una lista con i filename collegati ai vari commit relativi alle issues
+        ArrayList<String> fileNameList = buildFilenameList(issues);
+
         for ( Issue issue : issues ){
-            for ( CommitDetails commit : issue.getCommits() ){
-                for ( CommitFileDetails file : commit.getFilesChanged() ){
-                    Metric newMetric = new Metric();
-                    version = commit.getVersion();
-                    filepath = file.getModifiedFileName();
-                    newMetric.setVersion(version);
-                    newMetric.setFilepath(filepath);
-                    newMetric.setNr( 1 );
-                    newMetric.setAge( file.getAge());
-                    newMetric.setChurn(file.getChurn());
-                    newMetric.appendAuthor(commit.getPerson().getName());
-                    newMetric.setLocTouched(file.getLocTouched());
-                    newMetric.setMaxLocAdded(file.getAddedLOC());
-                    newMetric.setLoc((int) file.getLoc());
-                    newMetric.setAvgLocAdded(file.getAddedLOC());
-                    newMetric.setAvgChangeSet(commit.getFilesChanged().size());
-                    newMetric.setMaxChangeSet(commit.getFilesChanged().size());
-                    newMetric.setNumImports(file.getNumImports());
-                    newMetric.setNumComments(file.getNumComments());
-                    newMetric.setBuggyness(String.valueOf(file.isBuggy()));
-                    if( !fileDataset.containsKey(version,filepath) ){
-                        fileDataset.put( version, filepath, newMetric);
-                    } else{
-                        Metric oldMetric = (Metric) fileDataset.get( version, filepath );
-                        newMetric.update(oldMetric);
-                        fileDataset.put( version, filepath, newMetric);
+            for ( CommitDetails commit : issue.getCommits() ) {
+                if (commit.getFilesChanged() != null) {
+                    for (CommitFileDetails file : commit.getFilesChanged()) {
+                        Metric newMetric = new Metric();
+                        version = commit.getVersion();
+                        filepath = file.getModifiedFileName();
+                        newMetric.setVersion(version);
+                        newMetric.setFilepath(filepath);
+                        newMetric.setNr(1);
+                        newMetric.setAge(file.getAge());
+                        newMetric.setChurn(file.getChurn());
+                        newMetric.appendAuthor(commit.getPerson().getName());
+                        newMetric.setLocTouched(file.getLocTouched());
+                        newMetric.setMaxLocAdded(file.getAddedLOC());
+                        newMetric.setLoc((int) file.getLoc());
+                        newMetric.setAvgLocAdded(file.getAddedLOC());
+                        newMetric.setAvgChangeSet(commit.getFilesChanged().size());
+                        newMetric.setMaxChangeSet(commit.getFilesChanged().size());
+                        newMetric.setNumImports(file.getNumImports());
+                        newMetric.setNumPublicAttributesOrMethods(file.getNumPublicAttributerOrMethods());
+                        newMetric.setBuggyness(String.valueOf(file.isBuggy()));
+                        if (!fileDataset.containsKey(version, filepath)) {
+                            fileDataset.put(version, filepath, newMetric);
+                        } else {
+                            Metric oldMetric = (Metric) fileDataset.get(version, filepath);
+                            newMetric.update(oldMetric);
+                            fileDataset.put(version, filepath, newMetric);
+                        }
                     }
                 }
             }
         }
+        for (int versionFile=0; versionFile <= 8; versionFile++){
+            for (String entry: fileNameList ){
+                if (!fileDataset.containsKey(versionFile, entry)) {
+                    Metric newMetric = new Metric();
+                    newMetric.setVersion(versionFile);
+                    newMetric.setFilepath(entry);
+                    newMetric.setNr(1);
+                    newMetric.setAge(0);
+                    newMetric.setChurn(0);
+                    newMetric.appendAuthor("");
+                    newMetric.setLocTouched(0);
+                    newMetric.setMaxLocAdded(0);
+                    newMetric.setLoc(0);
+                    newMetric.setAvgLocAdded(0);
+                    newMetric.setAvgChangeSet(0);
+                    newMetric.setMaxChangeSet(0);
+                    newMetric.setNumImports(0);
+                    newMetric.setNumPublicAttributesOrMethods(0);
+                    newMetric.setBuggyness("false");
+                    fileDataset.put(versionFile, entry, newMetric);
+                }
+            }
+        }
+
     }
 
-
+    /* Questo metodo si occupa di scrivere il CSV che rappresenta il dataset */
     public void writeToCSV(String projectName) throws IOException {
-
-        // Set the name of the file
         try (FileWriter csvWriter = new FileWriter("src/csv_output/" + projectName + "_dataset.csv")) {
 
-            /*
-             * metrics.Metrics Data Structure
-             *   (version)
-             *   (filepath)
-             *  0 - NumberRevisions
-             *  1 - NumberAuthors
-             *  2 - LOC
-             *  3 - AGE
-             *  4 - CHURN
-             *  5 - LOC_TOUCHED
-             *  6 - Max_Loc_Added
-             *  7 - Avg_Chg_set
-             *  8 - Max_Chg_Set
-             *  9 - Avg_LOC_Added
-             *  10 - numImports
-             *  11 - numComments
-             * 	12 - Buggyness
-             * */
-
-            // Append the first line
             csvWriter.append("Version Number");
             csvWriter.append(",");
             csvWriter.append("File Name");
@@ -119,16 +130,16 @@ public class DatasetBuilder {
             csvWriter.append(",");
             csvWriter.append("numImports");
             csvWriter.append(",");
-            csvWriter.append("numComments");
+            csvWriter.append("numPublicAttOrMet");
             csvWriter.append(",");
             csvWriter.append("Buggy");
             csvWriter.append("\n");
 
-            // The following Tree Map is used to insert dataset entries in the csv following the correct order (by version).
+            // Utilizzo questa mappa per inserire in modo ordinato (per versione) le entry nel csv
             Map<String, Metric> orderedMap = new TreeMap<>();
             var dataSetIterator = fileDataset.mapIterator();
 
-            // Iterate over the dataset
+            // Itero sul dataset
             while ( dataSetIterator.hasNext() ) {
                 dataSetIterator.next();
                 var key = dataSetIterator.getKey();
@@ -144,34 +155,50 @@ public class DatasetBuilder {
             }
 
             for ( Map.Entry<String, Metric> entry : orderedMap.entrySet() ) {
-
                 Metric metric = entry.getValue();
-                // Check that the version index is contained in the first half of the releases
-                    int nr = metric.getNr();
-                    String nAuth = Integer.toString(metric.getAuthors().size());
-                    String loc = Integer.toString(metric.getLoc()/nr);
-                    String age = Integer.toString(metric.getAge());
-                    String churn = Integer.toString(metric.getChurn());
-                    String locTouched = Integer.toString(metric.getLocTouched());
-                    String avgLocAdded = Integer.toString( ( metric.getAvgLocAdded()/nr ) );
-                    String maxLocAdded = Integer.toString(metric.getMaxLocAdded());
-                    String avgChgSet = Integer.toString(metric.getAvgChangeSet()/nr);
-                    String maxChgSet = Integer.toString(metric.getMaxChangeSet());
-                    String numImports = Integer.toString(metric.getNumImports());
-                    String numComments = Integer.toString(metric.getNumComments());
-                    String buggy = metric.getBuggyness().equals("true") ? "Yes" : "No";
 
-                    // Append the data
-                    csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metric.getNr() + "," + nAuth + ","
-                            + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
-                            + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numComments + "," +  buggy);
+                int number = metric.getNr();
+                String nAuth = Integer.toString(metric.getAuthors().size());
+                String loc = Integer.toString(metric.getLoc()/number);
+                String age = Integer.toString(metric.getAge());
+                String churn = Integer.toString(metric.getChurn());
+                String locTouched = Integer.toString(metric.getLocTouched());
+                String avgLocAdded = Integer.toString( ( metric.getAvgLocAdded()/number ) );
+                String maxLocAdded = Integer.toString(metric.getMaxLocAdded());
+                String avgChgSet = Integer.toString(metric.getAvgChangeSet()/number);
+                String maxChgSet = Integer.toString(metric.getMaxChangeSet());
+                String numImports = Integer.toString(metric.getNumImports());
+                String numPublicAttributesOrMethods = Integer.toString(metric.getNumPublicAttributesOrMethods());
+                String buggy = metric.getBuggyness().equals("true") ? "Yes" : "No";
 
-                    csvWriter.append("\n");
+                csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metric.getNr() + "," + nAuth + ","
+                        + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
+                        + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numPublicAttributesOrMethods + "," +  buggy);
+
+                csvWriter.append("\n");
 
             }
-
-            // Flush data to CSV
             csvWriter.flush();
         }
+    }
+
+    /*
+        Costruisce una lista con i filename collegati ai vari commit relativi alle issues
+    */
+    public ArrayList<String> buildFilenameList(List<Issue> issues){
+        ArrayList<String> fileNameList = new ArrayList<>();
+        for ( Issue issuen : issues ) {
+            for (CommitDetails commitn : issuen.getCommits()) {
+                if (commitn.getFilesChanged() != null) {
+                    for (CommitFileDetails filen : commitn.getFilesChanged()) {
+                        String filename = filen.getModifiedFileName();
+                        if (!fileNameList.contains(filename)){
+                            fileNameList.add(filename);
+                        }
+                    }
+                }
+            }
+        }
+        return fileNameList;
     }
 }

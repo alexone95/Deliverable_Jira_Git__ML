@@ -10,7 +10,7 @@ public class CommitFileDetails {
     private boolean buggy;
     private int churn;
     private int numImports;
-    private int numComments;
+    private int numPublicAttributerOrMethods;
     private int locTouched;
 
     public CommitFileDetails(String modifiedFileName, int addedLOC, int deletedLOC, int replacedLines, long loc, String fileText,
@@ -97,12 +97,12 @@ public class CommitFileDetails {
         this.numImports = numImports;
     }
 
-    public int getNumComments() {
-        return numComments;
+    public int getNumPublicAttributerOrMethods() {
+        return numPublicAttributerOrMethods;
     }
 
-    public void setNumComments(int numComments) {
-        this.numComments = numComments;
+    public void setNumPublicAttributerOrMethods(int numPublicAttributerOrMethods) {
+        this.numPublicAttributerOrMethods = numPublicAttributerOrMethods;
     }
 
     public int getLocTouched() {

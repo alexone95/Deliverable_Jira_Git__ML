@@ -18,7 +18,7 @@ public class Metric {
     private int avgChangeSet;
     private int maxChangeSet;
     private int numImports;
-    private int numComments;
+    private int numPublicAttributesOrMethods;
     private String buggyness;
 
     public int getVersion() {
@@ -125,12 +125,12 @@ public class Metric {
         this.numImports = numImports;
     }
 
-    public int getNumComments() {
-        return numComments;
+    public int getNumPublicAttributesOrMethods() {
+        return numPublicAttributesOrMethods;
     }
 
-    public void setNumComments(int numComments) {
-        this.numComments = numComments;
+    public void setNumPublicAttributesOrMethods(int numPublicAttributesOrMethods) {
+        this.numPublicAttributesOrMethods = numPublicAttributesOrMethods;
     }
 
     public String getBuggyness() {
@@ -146,39 +146,45 @@ public class Metric {
     }
 
     public void update( Metric oldMetric) {
-        // Sum up all nr.
+
         this.nr += oldMetric.getNr();
-        /* Append this author to the list of authors who have worked at this file within the release.
-           At the end, the size of this array will represent the total number of authors.*/
+        /* Appende l'autore alla lista degli autori, se non già presente, la metrica utilizzata sarà la dimensione
+            della lista. */
         if ( !oldMetric.getAuthors().contains(this.authors.get(0)) ){
             ArrayList<String> updateAuthors = (ArrayList<String>) oldMetric.getAuthors();
             updateAuthors.add( this.authors.get(0) );
             this.authors = updateAuthors;
-        } else { this.authors = (ArrayList<String>) oldMetric.getAuthors(); }
+        }
+        else {
+            this.authors = (ArrayList<String>) oldMetric.getAuthors();
+        }
+
         this.churn += oldMetric.getChurn();
         this.locTouched += oldMetric.getLocTouched();
-        // Sum up all loc ADDED within the release.
+
+        // Somma tutte le LOC aggiunte nella release
         this.avgLocAdded += oldMetric.getAvgLocAdded();
-        // Get the oldest version of this file within the release.
+
+        // Prende la versione con age maggiore del file
         if ( oldMetric.getAge() > this.age){
             this.age = oldMetric.getAge();
         }
-        // Sum up all loc reported for this file over all commits within the release.
+
+        // Somma tutte le LOC riportate dai commit relativi a questo file per una determinata versione
         this.loc += oldMetric.getLoc();
-        // Update MAX loc ADDED only if it is greater than the max loc added reached by previous commits within the release.
         if ( this.maxLocAdded <= oldMetric.getMaxLocAdded()){
             this.maxLocAdded = oldMetric.getMaxLocAdded();
         }
-        // Sum up all CHANGE SET SIZE over commits within the release.
+
         this.avgChangeSet += oldMetric.getAvgChangeSet();
-        // Update MAX CHANGE SET only if it is greater than the max chg set reached by previous commits within the release.
         if (this.maxChangeSet <= oldMetric.getMaxChangeSet()){
             this.maxChangeSet = oldMetric.getMaxChangeSet();
         }
-        // Sum up all loc reported for this file over all commits within the release.
+
+        // Calcola il numero totale di import su tutti i commit della release
         this.numImports += oldMetric.getNumImports();
-        // Sum up all loc reported for this file over all commits within the release.
-        this.numComments += oldMetric.getNumComments();
+        // Calcola il numero totale degli attributi pubblici su tutti i commit della release
+        this.numPublicAttributesOrMethods += oldMetric.getNumPublicAttributesOrMethods();
 
     }
 
