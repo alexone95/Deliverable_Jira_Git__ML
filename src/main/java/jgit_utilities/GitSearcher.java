@@ -151,7 +151,7 @@ public class GitSearcher {
                     .call();
         }
         catch (ArrayIndexOutOfBoundsException e){
-            return null;
+            return changedFilesList;
         }
 
         for (DiffEntry diff : diffs) {

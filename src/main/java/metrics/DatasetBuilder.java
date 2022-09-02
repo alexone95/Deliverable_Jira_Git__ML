@@ -39,7 +39,7 @@ public class DatasetBuilder {
         String  filepath;
 
         // Costruisce una lista con i filename collegati ai vari commit relativi alle issues
-        ArrayList<String> fileNameList = buildFilenameList(issues);
+        ArrayList<String> fileNameList = (ArrayList<String>) buildFilenameList(issues);
 
         for ( Issue issue : issues ){
             for ( CommitDetails commit : issue.getCommits() ) {
@@ -74,29 +74,9 @@ public class DatasetBuilder {
                 }
             }
         }
-        for (int versionFile=0; versionFile <= 8; versionFile++){
-            for (String entry: fileNameList ){
-                if (!fileDataset.containsKey(versionFile, entry)) {
-                    Metric newMetric = new Metric();
-                    newMetric.setVersion(versionFile);
-                    newMetric.setFilepath(entry);
-                    newMetric.setNr(1);
-                    newMetric.setAge(0);
-                    newMetric.setChurn(0);
-                    newMetric.appendAuthor("");
-                    newMetric.setLocTouched(0);
-                    newMetric.setMaxLocAdded(0);
-                    newMetric.setLoc(0);
-                    newMetric.setAvgLocAdded(0);
-                    newMetric.setAvgChangeSet(0);
-                    newMetric.setMaxChangeSet(0);
-                    newMetric.setNumImports(0);
-                    newMetric.setNumPublicAttributesOrMethods(0);
-                    newMetric.setBuggyness("false");
-                    fileDataset.put(versionFile, entry, newMetric);
-                }
-            }
-        }
+
+        setFileDataset(fileNameList);
+
 
     }
 
@@ -185,7 +165,7 @@ public class DatasetBuilder {
     /*
         Costruisce una lista con i filename collegati ai vari commit relativi alle issues
     */
-    public ArrayList<String> buildFilenameList(List<Issue> issues){
+    public List<String> buildFilenameList(List<Issue> issues){
         ArrayList<String> fileNameList = new ArrayList<>();
         for ( Issue issuen : issues ) {
             for (CommitDetails commitn : issuen.getCommits()) {
@@ -200,5 +180,31 @@ public class DatasetBuilder {
             }
         }
         return fileNameList;
+    }
+
+    public void setFileDataset(ArrayList<String> fileNameList){
+        for (int versionFile=0; versionFile <= 8; versionFile++){
+            for (String entry: fileNameList ){
+                if (!fileDataset.containsKey(versionFile, entry)) {
+                    Metric newMetric = new Metric();
+                    newMetric.setVersion(versionFile);
+                    newMetric.setFilepath(entry);
+                    newMetric.setNr(1);
+                    newMetric.setAge(0);
+                    newMetric.setChurn(0);
+                    newMetric.appendAuthor("");
+                    newMetric.setLocTouched(0);
+                    newMetric.setMaxLocAdded(0);
+                    newMetric.setLoc(0);
+                    newMetric.setAvgLocAdded(0);
+                    newMetric.setAvgChangeSet(0);
+                    newMetric.setMaxChangeSet(0);
+                    newMetric.setNumImports(0);
+                    newMetric.setNumPublicAttributesOrMethods(0);
+                    newMetric.setBuggyness("false");
+                    fileDataset.put(versionFile, entry, newMetric);
+                }
+            }
+        }
     }
 }

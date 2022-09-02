@@ -126,7 +126,6 @@ public class RetrieveTicketsID {
             JSONObject json = readJsonFromUrl(url);
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
-            //total = 200;
 
             // Per ogni ticket chiuso o risolto di tipo bug vado a prendere la chiave
             for (; i < total && i < j; i++) {
