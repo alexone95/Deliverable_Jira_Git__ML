@@ -35,8 +35,7 @@ public class DatasetBuilder {
 
     /*  Metodo utilizzato per popolare @fileDataset  */
     public void populateFileDataset( List<Issue> issues ){
-        int     version;
-        String  filepath;
+
 
         // Costruisce una lista con i filename collegati ai vari commit relativi alle issues
         ArrayList<String> fileNameList = (ArrayList<String>) buildFilenameList(issues);
@@ -44,33 +43,7 @@ public class DatasetBuilder {
         for ( Issue issue : issues ){
             for ( CommitDetails commit : issue.getCommits() ) {
                 if (commit.getFilesChanged() != null) {
-                    for (CommitFileDetails file : commit.getFilesChanged()) {
-                        Metric newMetric = new Metric();
-                        version = commit.getVersion();
-                        filepath = file.getModifiedFileName();
-                        newMetric.setVersion(version);
-                        newMetric.setFilepath(filepath);
-                        newMetric.setNr(1);
-                        newMetric.setAge(file.getAge());
-                        newMetric.setChurn(file.getChurn());
-                        newMetric.appendAuthor(commit.getPerson().getName());
-                        newMetric.setLocTouched(file.getLocTouched());
-                        newMetric.setMaxLocAdded(file.getAddedLOC());
-                        newMetric.setLoc((int) file.getLoc());
-                        newMetric.setAvgLocAdded(file.getAddedLOC());
-                        newMetric.setAvgChangeSet(commit.getFilesChanged().size());
-                        newMetric.setMaxChangeSet(commit.getFilesChanged().size());
-                        newMetric.setNumImports(file.getNumImports());
-                        newMetric.setNumPublicAttributesOrMethods(file.getNumPublicAttributerOrMethods());
-                        newMetric.setBuggyness(String.valueOf(file.isBuggy()));
-                        if (!fileDataset.containsKey(version, filepath)) {
-                            fileDataset.put(version, filepath, newMetric);
-                        } else {
-                            Metric oldMetric = (Metric) fileDataset.get(version, filepath);
-                            newMetric.update(oldMetric);
-                            fileDataset.put(version, filepath, newMetric);
-                        }
-                    }
+                    setMetrics(commit);
                 }
             }
         }
@@ -182,7 +155,7 @@ public class DatasetBuilder {
         return fileNameList;
     }
 
-    public void setFileDataset(ArrayList<String> fileNameList){
+    public void setFileDataset(List<String> fileNameList){
         for (int versionFile=0; versionFile <= 8; versionFile++){
             for (String entry: fileNameList ){
                 if (!fileDataset.containsKey(versionFile, entry)) {
@@ -204,6 +177,42 @@ public class DatasetBuilder {
                     newMetric.setBuggyness("false");
                     fileDataset.put(versionFile, entry, newMetric);
                 }
+            }
+        }
+    }
+
+    /*
+        Costruisce l'oggetto Metric e lo aggiunge al dataset
+    */
+    public void setMetrics(CommitDetails commit)
+    {
+        int     version;
+        String  filepath;
+        for (CommitFileDetails file : commit.getFilesChanged()) {
+            Metric newMetric = new Metric();
+            version = commit.getVersion();
+            filepath = file.getModifiedFileName();
+            newMetric.setVersion(version);
+            newMetric.setFilepath(filepath);
+            newMetric.setNr(1);
+            newMetric.setAge(file.getAge());
+            newMetric.setChurn(file.getChurn());
+            newMetric.appendAuthor(commit.getPerson().getName());
+            newMetric.setLocTouched(file.getLocTouched());
+            newMetric.setMaxLocAdded(file.getAddedLOC());
+            newMetric.setLoc((int) file.getLoc());
+            newMetric.setAvgLocAdded(file.getAddedLOC());
+            newMetric.setAvgChangeSet(commit.getFilesChanged().size());
+            newMetric.setMaxChangeSet(commit.getFilesChanged().size());
+            newMetric.setNumImports(file.getNumImports());
+            newMetric.setNumPublicAttributesOrMethods(file.getNumPublicAttributerOrMethods());
+            newMetric.setBuggyness(String.valueOf(file.isBuggy()));
+            if (!fileDataset.containsKey(version, filepath)) {
+                fileDataset.put(version, filepath, newMetric);
+            } else {
+                Metric oldMetric = (Metric) fileDataset.get(version, filepath);
+                newMetric.update(oldMetric);
+                fileDataset.put(version, filepath, newMetric);
             }
         }
     }

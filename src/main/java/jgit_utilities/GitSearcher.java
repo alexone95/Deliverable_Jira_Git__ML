@@ -102,7 +102,10 @@ public class GitSearcher {
                     CommitDetails commitDetail = new CommitDetails();
                     commitDetail.setCommit(commit);
                     commitDetail.setVersion(version);
-                    commitDetail.setFilesChanged(commitChanges(commit, commitDetail, issue));
+                    List<CommitFileDetails> commitChanges = commitChanges(commit, commitDetail, issue);
+                    if (commitChanges.isEmpty())
+                        commitChanges = null;
+                    commitDetail.setFilesChanged(commitChanges);
                     commitDetail.setPerson(commit.getAuthorIdent());
                     commitDetail.setAddedLoc();
                     commitDetail.setDeletedLoc();
