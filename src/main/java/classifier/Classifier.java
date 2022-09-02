@@ -23,7 +23,7 @@ public class Classifier {
         List<Integer> resultTraining;
 
         // Numero di versioni considerate
-        int limit = 7;
+        int limit = 14;  //8 per Bookkeeper e 14 per openJPA
 
         try (FileWriter csvWriter = new FileWriter("src/output/" + PROJ_NAME + "_out.csv")) {
 
