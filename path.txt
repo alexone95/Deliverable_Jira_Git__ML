@@ -1,1 +1,1 @@
-C:/Users/daniele/IdeaProjects/openjpa/.git
+C:/Users/daniele/IdeaProjects/bookkeeper/.git

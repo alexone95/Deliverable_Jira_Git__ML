@@ -13,7 +13,7 @@ import java.util.List;
 public class Classifier {
     private static final String TRAINING = "_training.arff";
     private static final String TESTING = "_testing.arff";
-    private static final String PROJ_NAME = "OPENJPA";
+    private static final String PROJ_NAME = "BOOKKEEPER";
 
     private Classifier() {
     }
@@ -23,7 +23,7 @@ public class Classifier {
         List<Integer> resultTraining;
 
         // Numero di versioni considerate
-        int limit = 14;  //8 per Bookkeeper e 14 per openJPA
+        int limit = 8;  //8 per Bookkeeper e 14 per openJPA
 
         try (FileWriter csvWriter = new FileWriter("src/output/" + PROJ_NAME + "_out.csv")) {
 

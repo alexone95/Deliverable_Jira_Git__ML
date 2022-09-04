@@ -27,7 +27,7 @@ import static utils.Utils.fillAffectedVersionList;
 
 public class RetrieveTicketsID {
 
-    public static final String PROJECT_NAME = "OPENJPA";
+    public static final String PROJECT_NAME = "BOOKKEEPER";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
     private static final List<Issue> list_of_issues_with_AV = new ArrayList<>();

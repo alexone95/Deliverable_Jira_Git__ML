@@ -90,26 +90,28 @@ public class DatasetBuilder {
 
             // Utilizzo questa mappa per inserire in modo ordinato (per versione) le entry nel csv
             Map<String, Metric> orderedMap = new TreeMap<>();
-            var dataSetIterator = fileDataset.mapIterator();
+            var iterator = fileDataset.mapIterator();
 
-            // Itero sul dataset
-            while ( dataSetIterator.hasNext() ) {
-                dataSetIterator.next();
-                var key = dataSetIterator.getKey();
+            // Itero sul dataset per ordinarlo per versione
+            while (iterator.hasNext()) {
+                iterator.next();
+                var key = iterator.getKey();
 
                 int version = (int) key.getKey(0);
-                if ( version <= lastVersion + 1 ){
-                    String revisedKey = String.valueOf( version );
-                    if ( revisedKey.length() == 1 ){ revisedKey = "0" + revisedKey; }
+                if (version <= lastVersion + 1){
+                    String newKey = String.valueOf( version );
+                    if (newKey.length() == 1) {
+                        newKey = "0" + newKey;
+                    }
                     Metric metric = (Metric) fileDataset.get(key.getKey(0), key.getKey(1));
 
-                    orderedMap.put( revisedKey + "," + (String)key.getKey(1), metric);
+                    orderedMap.put(newKey + "," + key.getKey(1), metric);
                 }
             }
 
-            for ( Map.Entry<String, Metric> entry : orderedMap.entrySet() ) {
+            // Itero su orderedMap che è un istanza di Map ordinata per versione
+            for (Map.Entry<String, Metric> entry : orderedMap.entrySet()) {
                 Metric metric = entry.getValue();
-
                 int number = metric.getNr();
                 String nAuth = Integer.toString(metric.getAuthors().size());
                 String loc = Integer.toString(metric.getLoc()/number);
@@ -124,9 +126,12 @@ public class DatasetBuilder {
                 String numPublicAttributesOrMethods = Integer.toString(metric.getNumPublicAttributesOrMethods());
                 String buggy = metric.getBuggyness().equals("true") ? "Yes" : "No";
 
-                csvWriter.append(entry.getKey().split(",")[0] + "," + entry.getKey().split(",")[1] + "," + metric.getNr() + "," + nAuth + ","
-                        + loc + "," + age + "," + churn + ","+ locTouched + "," + avgLocAdded + "," +  maxLocAdded + ","
-                        + avgChgSet + "," + maxChgSet + ","  + numImports + ","  + numPublicAttributesOrMethods + "," +  buggy);
+                csvWriter.append(entry.getKey().split(",")[0]).append(",").
+                        append(entry.getKey().split(",")[1]).append(",").append(String.valueOf(metric.getNr())).
+                        append(",").append(nAuth).append(",").append(loc).append(",").append(age).append(",").
+                        append(churn).append(",").append(locTouched).append(",").append(avgLocAdded).append(",").
+                        append(maxLocAdded).append(",").append(avgChgSet).append(",").append(maxChgSet).append(",").
+                        append(numImports).append(",").append(numPublicAttributesOrMethods).append(",").append(buggy);
 
                 csvWriter.append("\n");
 
@@ -140,11 +145,11 @@ public class DatasetBuilder {
     */
     public List<String> buildFilenameList(List<Issue> issues){
         ArrayList<String> fileNameList = new ArrayList<>();
-        for ( Issue issuen : issues ) {
-            for (CommitDetails commitn : issuen.getCommits()) {
-                if (commitn.getFilesChanged() != null) {
-                    for (CommitFileDetails filen : commitn.getFilesChanged()) {
-                        String filename = filen.getModifiedFileName();
+        for ( Issue issue : issues ) {
+            for (CommitDetails commit : issue.getCommits()) {
+                if (commit.getFilesChanged() != null) {
+                    for (CommitFileDetails file : commit.getFilesChanged()) {
+                        String filename = file.getModifiedFileName();
                         if (!fileNameList.contains(filename)){
                             fileNameList.add(filename);
                         }
@@ -156,7 +161,8 @@ public class DatasetBuilder {
     }
 
     public void setFileDataset(List<String> fileNameList){
-        for (int versionFile=0; versionFile <= 8; versionFile++){
+        int limit = 8;
+        for (int versionFile=0; versionFile <= limit; versionFile++){
             for (String entry: fileNameList ){
                 if (!fileDataset.containsKey(versionFile, entry)) {
                     Metric newMetric = new Metric();
