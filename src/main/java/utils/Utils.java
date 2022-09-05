@@ -18,6 +18,7 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.supervised.instance.Resample;
+import weka.filters.supervised.instance.SMOTE;
 import weka.filters.supervised.instance.SpreadSubsample;
 
 import java.io.*;
@@ -185,22 +186,18 @@ public class Utils {
 
                 // Legge fino all'ultima riga
                 while ((line = br.readLine()) != null){
-
                     // Controlla se la versione è inferiore al limite imposto (metà delle versioni)
                     if (Integer.parseInt(line.split(",")[0]) <= trainingLimit ) {
                         counterElement = counterElement + 1;
-
                         counterDefective = counterDefective + appendToCSV(csvWriter, line);
                     }
                 }
 
                 csvWriter.flush();
-
                 counterList.add(counterElement);
                 counterList.add(counterDefective);
 
                 return counterList;
-
             }
         }
     }
@@ -233,31 +230,25 @@ public class Utils {
             csvWriter.append("@data\n");
 
             try (BufferedReader br = new BufferedReader(new FileReader("src/csv_output/" + projectName + "_dataset.csv"))){
-
+                // Salta l'intestazione
                 String line = br.readLine();
 
                 while ((line = br.readLine()) != null){
-
                     if (Integer.parseInt(line.split(",")[0]) == testing ) {
-
                         counterElement = counterElement + 1;
-
                         counterDefective = counterDefective + appendToCSV(csvWriter, line);
                     }
                 }
 
                 csvWriter.flush();
-
                 counterList.add(counterElement);
                 counterList.add(counterDefective);
-
             }
         }
 
         if ( counterElement <= 5 ) {
             throw(new NoVersionException("Non ci sono entry per la versione", testing ));
         }
-
         return counterList;
     }
 
@@ -417,15 +408,14 @@ public class Utils {
         classifierIBk.buildClassifier(training);
 
         // Valutazione del sistema senza feature selection e senza sampling
-        Evaluation eval;
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(null, eval, training, testing, classifierRF), result, "RF", NO_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(null, new Evaluation(training), training, testing, classifierRF),
+                result, "RF", NO_SAMPLING, featureSelection);
 
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(null, eval, training, testing, classifierIBk), result, "IBk", NO_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(null, new Evaluation(training), training, testing, classifierIBk),
+                result, "IBk", NO_SAMPLING, featureSelection);
 
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(null, eval, training, testing, classifierNB), result, "NB", NO_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(null, new Evaluation(training), training, testing, classifierNB),
+                result, "NB", NO_SAMPLING, featureSelection);
 
         // Applica l'undersampling
         FilteredClassifier fc = new FilteredClassifier();
@@ -435,14 +425,14 @@ public class Utils {
         underSampling.setOptions(opts);
         fc.setFilter(underSampling);
 
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", UNDER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(training), training, testing, classifierRF),
+                result, "RF", UNDER_SAMPLING, featureSelection);
 
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", UNDER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(training), training, testing, classifierIBk),
+                result, "IBk", UNDER_SAMPLING, featureSelection);
 
-        eval = new Evaluation(training);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", UNDER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(training), training, testing, classifierNB),
+                result, "NB", UNDER_SAMPLING, featureSelection);
 
         // Applica l'oversampling
         fc = new FilteredClassifier();
@@ -452,24 +442,29 @@ public class Utils {
         overSampling.setOptions(optsOverSampling);
         fc.setFilter(overSampling);
 
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", OVER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierRF),
+                result, "RF", OVER_SAMPLING, featureSelection);
 
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", OVER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierIBk),
+                result, "IBk", OVER_SAMPLING, featureSelection);
 
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", OVER_SAMPLING, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierNB),
+                result, "NB", OVER_SAMPLING, featureSelection);
 
         // Applica SMOTE
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierRF), result, "RF", SMOTE, featureSelection);
+        weka.filters.supervised.instance.SMOTE smote = new SMOTE();
+        fc = new FilteredClassifier();
+        smote.setInputFormat(training);
+        fc.setFilter(smote);
 
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierIBk), result, "IBk", SMOTE, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierRF),
+                result, "RF", SMOTE, featureSelection);
 
-        eval = new Evaluation(testing);
-        addResult(applyFilterForSampling(fc, eval, training, testing, classifierNB), result, "NB", SMOTE, featureSelection);
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierIBk),
+                result, "IBk", SMOTE, featureSelection);
+
+        addResult(applyFilterForSampling(fc, new Evaluation(testing), training, testing, classifierNB),
+                result, "NB", SMOTE, featureSelection);
 
         return result;
     }
