@@ -180,14 +180,14 @@ public class GitSearcher {
             }
 
             boolean buggy = Utils.retrieveBugginess(commitObject.getVersion(), issue.getFixVersion(), issue.getInjectedVersion());
-            int numImports = Utils.getNumImports(fileText);
+            int numPrivateAttributesOrMethods = Utils.getPrivateAttributesOrMethods(fileText);
             int numPublicAttributesOrMethods = Utils.getPublicAttributesOrMethods(fileText);
 
             CommitFileDetails commitFileDetails = new CommitFileDetails(fileName, linesAdded, linesDeleted, linesReplaced,
                     Utils.countLineBufferedReader(fileText), fileText, age);
 
             commitFileDetails.setBuggy(buggy);
-            commitFileDetails.setNumImports(numImports);
+            commitFileDetails.setNumPrivateAttributerOrMethods(numPrivateAttributesOrMethods);
             commitFileDetails.setNumPublicAttributerOrMethods(numPublicAttributesOrMethods);
 
             changedFilesList.add(commitFileDetails);

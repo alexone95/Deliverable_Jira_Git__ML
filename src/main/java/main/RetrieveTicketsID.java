@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static utils.Utils.average;
 import static utils.Utils.fillAffectedVersionList;
 
 public class RetrieveTicketsID {
 
-    public static final String PROJECT_NAME = "BOOKKEEPER";
+    public static final String PROJECT_NAME = "OPENJPA";
     private static final Multimap<LocalDate, String> version_map =  MultimapBuilder.treeKeys().linkedListValues().build();
     private static final List<Issue> list_of_issues = new ArrayList<>();
     private static final List<Issue> list_of_issues_with_AV = new ArrayList<>();
@@ -168,15 +169,6 @@ public class RetrieveTicketsID {
 
     }
 
-    public static double average( List<Double> array ){
-        double avg;
-        double sum = 0.0;
-        for ( double p : array ){
-            sum += p;
-        }
-        avg = ( sum/( array.size() ) );
-        return avg;
-    }
 
     public static void setOpeningAndFixedVersions(){
         /*
@@ -242,8 +234,8 @@ public class RetrieveTicketsID {
             La injected version viene impostata come il minimo tra tutte le affected version dichiarate nella issue
         */
         int iv;
-        for ( Issue issue : list_of_issues_with_AV ){
-            iv = Collections.min( issue.getAffectedVersionIndex());
+        for (Issue issue : list_of_issues_with_AV){
+            iv = Collections.min(issue.getAffectedVersionIndex());
             issue.setInjectedVersion(iv);
         }
     }
@@ -251,15 +243,15 @@ public class RetrieveTicketsID {
     public static void computeProportionIncremental(List<Issue> issues){
         /*
             Effettua il calcolo della proportion, nello specifico andando ad indicare P come la media delle
-            versioni precedenti.
+            versioni precedenti considerando le issue che hanno le affected e le injection version.
         */
         ArrayList<Double> proportions = new ArrayList<>();
-        for ( Issue issue : issues ){
-            if ( issue.getOpeningVersion() != issue.getFixVersion()) {
+        for (Issue issue : issues){
+            if (issue.getOpeningVersion() != issue.getFixVersion()) {
                 double fv = issue.getFixVersion();
                 double ov = issue.getOpeningVersion();
                 double iv = issue.getInjectedVersion();
-                double p = ( fv - iv )/( fv - ov );
+                double p = (fv - iv)/(fv - ov);
                 proportions.add( p );
             }
         }
@@ -269,24 +261,25 @@ public class RetrieveTicketsID {
     public static void setAffectedAndInjectedVersionsP(List<Issue> issues){
         /*
             Andiamo ad assegnare la affected e la injected version stimata sfruttando il valore di P precedentemente
-            calcolato su tutte le issue.
+            calcolato su tutte le issue di cui avevamo le affected version.
         */
         for ( Issue issue : issues ){
             int fv = issue.getFixVersion();
             int ov = issue.getOpeningVersion();
             int pInt = (int) p;
-            if ( fv == ov ) {
-                issue.setInjectedVersion(fv - pInt);
-            } else{
-                issue.setInjectedVersion(fv - ((fv - ov) * pInt));
-            }
+            issue.setInjectedVersion(fv - ((fv - ov) * pInt));
+
             int minAVValue = issue.getInjectedVersion();
             int maxAVValue = issue.getFixVersion() - 1;
+            // Come affected version imposto la lista di versioni che sono incluse tra l'injected e la fix version-1
             issue.setAffectedVersionIndex(new ArrayList<>( IntStream.rangeClosed(minAVValue, maxAVValue).boxed().collect(Collectors.toList()) ));
         }
     }
 
     public static void removeIssuesWithoutCommits(){
+        /*
+            Rimuove le issue senza commit
+        */
         list_of_issues.removeIf( issue -> issue.getCommits().isEmpty() );
     }
 
@@ -307,6 +300,10 @@ public class RetrieveTicketsID {
 
 
     public static void populateDatasetMapAndWriteToCSV() throws IOException{
+    /*
+        Questo metodo permette il caricamento e il computo delle metriche attraverso i dati conservati negli oggetti
+        CommitFileDetails e la conseguente scrittura sul CSV
+    */
         datasetBuilder.populateFileDataset(list_of_issues_with_AV);
         datasetBuilder.populateFileDataset(list_of_issues_without_AV);
         datasetBuilder.writeToCSV(PROJECT_NAME);

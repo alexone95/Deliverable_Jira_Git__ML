@@ -81,7 +81,7 @@ public class DatasetBuilder {
             csvWriter.append(",");
             csvWriter.append("Max_Chg_Set");
             csvWriter.append(",");
-            csvWriter.append("numImports");
+            csvWriter.append("numPrivateAttOrMet");
             csvWriter.append(",");
             csvWriter.append("numPublicAttOrMet");
             csvWriter.append(",");
@@ -118,11 +118,11 @@ public class DatasetBuilder {
                 String age = Integer.toString(metric.getAge());
                 String churn = Integer.toString(metric.getChurn());
                 String locTouched = Integer.toString(metric.getLocTouched());
-                String avgLocAdded = Integer.toString( ( metric.getAvgLocAdded()/number ) );
+                String avgLocAdded = Integer.toString((metric.getAvgLocAdded()/number));
                 String maxLocAdded = Integer.toString(metric.getMaxLocAdded());
                 String avgChgSet = Integer.toString(metric.getAvgChangeSet()/number);
                 String maxChgSet = Integer.toString(metric.getMaxChangeSet());
-                String numImports = Integer.toString(metric.getNumImports());
+                String numPrivateAttributesOrMethods = Integer.toString(metric.getNumPrivateAttributesOrMethods());
                 String numPublicAttributesOrMethods = Integer.toString(metric.getNumPublicAttributesOrMethods());
                 String buggy = metric.getBuggyness().equals("true") ? "Yes" : "No";
 
@@ -131,7 +131,8 @@ public class DatasetBuilder {
                         append(",").append(nAuth).append(",").append(loc).append(",").append(age).append(",").
                         append(churn).append(",").append(locTouched).append(",").append(avgLocAdded).append(",").
                         append(maxLocAdded).append(",").append(avgChgSet).append(",").append(maxChgSet).append(",").
-                        append(numImports).append(",").append(numPublicAttributesOrMethods).append(",").append(buggy);
+                        append(numPrivateAttributesOrMethods).append(",").append(numPublicAttributesOrMethods).
+                        append(",").append(buggy);
 
                 csvWriter.append("\n");
 
@@ -161,7 +162,7 @@ public class DatasetBuilder {
     }
 
     public void setFileDataset(List<String> fileNameList){
-        int limit = 8;
+        int limit = 14;
         for (int versionFile=0; versionFile <= limit; versionFile++){
             for (String entry: fileNameList ){
                 if (!fileDataset.containsKey(versionFile, entry)) {
@@ -178,7 +179,7 @@ public class DatasetBuilder {
                     newMetric.setAvgLocAdded(0);
                     newMetric.setAvgChangeSet(0);
                     newMetric.setMaxChangeSet(0);
-                    newMetric.setNumImports(0);
+                    newMetric.setNumPrivateAttributesOrMethods(0);
                     newMetric.setNumPublicAttributesOrMethods(0);
                     newMetric.setBuggyness("false");
                     fileDataset.put(versionFile, entry, newMetric);
@@ -210,7 +211,7 @@ public class DatasetBuilder {
             newMetric.setAvgLocAdded(file.getAddedLOC());
             newMetric.setAvgChangeSet(commit.getFilesChanged().size());
             newMetric.setMaxChangeSet(commit.getFilesChanged().size());
-            newMetric.setNumImports(file.getNumImports());
+            newMetric.setNumPrivateAttributesOrMethods(file.getNumPrivateAttributerOrMethods());
             newMetric.setNumPublicAttributesOrMethods(file.getNumPublicAttributerOrMethods());
             newMetric.setBuggyness(String.valueOf(file.isBuggy()));
             if (!fileDataset.containsKey(version, filepath)) {

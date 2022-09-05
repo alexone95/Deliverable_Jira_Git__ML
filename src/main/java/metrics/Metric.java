@@ -7,7 +7,7 @@ public class Metric {
 
     private int version;
     private String filepath;
-    private int nr;
+    private int nr; //Numero di revisioni
     private ArrayList<String> authors = new ArrayList<>();
     private int loc;
     private int locTouched;
@@ -17,7 +17,7 @@ public class Metric {
     private int avgLocAdded;
     private int avgChangeSet;
     private int maxChangeSet;
-    private int numImports;
+    private int numPrivateAttributesOrMethods;
     private int numPublicAttributesOrMethods;
     private String buggyness;
 
@@ -117,12 +117,12 @@ public class Metric {
         this.maxChangeSet = maxChangeSet;
     }
 
-    public int getNumImports() {
-        return numImports;
+    public int getNumPrivateAttributesOrMethods() {
+        return numPrivateAttributesOrMethods;
     }
 
-    public void setNumImports(int numImports) {
-        this.numImports = numImports;
+    public void setNumPrivateAttributesOrMethods(int numPrivateAttributesOrMethods) {
+        this.numPrivateAttributesOrMethods = numPrivateAttributesOrMethods;
     }
 
     public int getNumPublicAttributesOrMethods() {
@@ -182,7 +182,7 @@ public class Metric {
         }
 
         // Calcola il numero totale di import su tutti i commit della release
-        this.numImports += oldMetric.getNumImports();
+        this.numPrivateAttributesOrMethods += oldMetric.getNumPrivateAttributesOrMethods();
         // Calcola il numero totale degli attributi pubblici su tutti i commit della release
         this.numPublicAttributesOrMethods += oldMetric.getNumPublicAttributesOrMethods();
 

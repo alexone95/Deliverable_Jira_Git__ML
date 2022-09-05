@@ -9,7 +9,7 @@ public class CommitFileDetails {
     private int age;
     private boolean buggy;
     private int churn;
-    private int numImports;
+    private int numPrivateAttributerOrMethods;
     private int numPublicAttributerOrMethods;
     private int locTouched;
 
@@ -89,12 +89,12 @@ public class CommitFileDetails {
         this.churn = churn;
     }
 
-    public int getNumImports() {
-        return numImports;
+    public int getNumPrivateAttributerOrMethods() {
+        return numPrivateAttributerOrMethods;
     }
 
-    public void setNumImports(int numImports) {
-        this.numImports = numImports;
+    public void setNumPrivateAttributerOrMethods(int numPrivateAttributerOrMethods) {
+        this.numPrivateAttributerOrMethods = numPrivateAttributerOrMethods;
     }
 
     public int getNumPublicAttributerOrMethods() {

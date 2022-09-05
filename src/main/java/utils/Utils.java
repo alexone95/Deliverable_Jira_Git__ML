@@ -172,7 +172,7 @@ public class Utils {
             csvWriter.append("@attribute MaxLocAdded real\n");
             csvWriter.append("@attribute AvgChgSet real\n");
             csvWriter.append("@attribute MaxChgSet real\n");
-            csvWriter.append("@attribute numImports real\n");
+            csvWriter.append("@attribute numPrivateAttributesOrMethods real\n");
             csvWriter.append("@attribute numPublicAttributesOrMethods real\n");
             csvWriter.append("@attribute Buggy {Yes, No}\n\n");
             csvWriter.append("@data\n");
@@ -227,7 +227,7 @@ public class Utils {
             csvWriter.append("@attribute MaxLocAdded real\n");
             csvWriter.append("@attribute AvgChgSet real\n");
             csvWriter.append("@attribute MaxChgSet real\n");
-            csvWriter.append("@attribute numImports real\n");
+            csvWriter.append("@attribute numPrivateAttributesOrMethods real\n");
             csvWriter.append("@attribute numPublicAttributesOrMethods real\n");
             csvWriter.append("@attribute Buggy {Yes, No}\n\n");
             csvWriter.append("@data\n");
@@ -267,19 +267,23 @@ public class Utils {
         return classifier + "," + balancing + "," + featureSelection + "," + eval.truePositiveRate(1)  + "," + eval.falsePositiveRate(1)  + "," + eval.trueNegativeRate(1)  + "," + eval.falseNegativeRate(1)  + "," + eval.precision(1)  + "," + eval.recall(1)  + "," + eval.areaUnderROC(1)  + "," + eval.kappa() + "\n";
     }
 
-    /* Questo metodo ritorna il numero di imports in un file .java */
-    public static int getNumImports( String fileText ){
-        int numImports = 0;
-        try ( BufferedReader reader = new BufferedReader(new StringReader(fileText)) ) {
-            for ( String line = reader.readLine(); line != null; line = reader.readLine()) {
-                if( line.contains( "import" )){
-                    numImports ++;
+    /* Questo metodo ritorna il numero di attributi privati in un file .java */
+    public static int getPrivateAttributesOrMethods(String fileText){
+        int numPublicAttributesOrMethods = 0;
+        String regex = "\\bpublic\\b"; //regex che vada a prendere la singola parola public
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher;
+        try (BufferedReader reader = new BufferedReader(new StringReader(fileText))) {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                matcher = pattern.matcher(line);
+                if(matcher.find()){
+                    numPublicAttributesOrMethods ++;
                 }
             }
-        } catch ( IOException e ) {
+        } catch (IOException e) {
             return 0;
         }
-        return numImports;
+        return numPublicAttributesOrMethods;
     }
 
     /* Questo metodo ritorna il numero di attributi pubblici in un file .java */
@@ -357,6 +361,15 @@ public class Utils {
 
     }
 
+    public static double average( List<Double> array ){
+        double avg;
+        double sum = 0.0;
+        for ( double p : array ){
+            sum += p;
+        }
+        avg = ( sum/( array.size() ) );
+        return avg;
+    }
 
     public static void addResult(Evaluation eval, List<String> result, String classifierAbb, String sampling, String featureSelection) {
         result.add(retrieveMetrics(eval,classifierAbb, sampling, featureSelection));
