@@ -260,7 +260,7 @@ public class Utils {
 
     /* Questo metodo ritorna il numero di attributi privati in un file .java */
     public static int getPrivateAttributesOrMethods(String fileText){
-        int numPublicAttributesOrMethods = 0;
+        int numPrivateAttributesOrMethods = 0;
         String regex = "\\bprivate\\b"; //regex che vada a prendere la singola parola public
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher;
@@ -268,13 +268,13 @@ public class Utils {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 matcher = pattern.matcher(line);
                 if(matcher.find()){
-                    numPublicAttributesOrMethods ++;
+                    numPrivateAttributesOrMethods ++;
                 }
             }
         } catch (IOException e) {
             return 0;
         }
-        return numPublicAttributesOrMethods;
+        return numPrivateAttributesOrMethods;
     }
 
     /* Questo metodo ritorna il numero di attributi pubblici in un file .java */
