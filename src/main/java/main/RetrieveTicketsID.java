@@ -176,19 +176,19 @@ public class RetrieveTicketsID {
             dell'oggetto issue. Per la fixversion andiamo ad utilizzare la resolution date, mentre per quanto riguarda
             la opening version andiamo ad utilizzare la creation date.
         */
-        for ( Issue issue : list_of_issues ){
+        for (Issue issue : list_of_issues){
             // Fix Version
-            for( LocalDate date : version_map.keySet()){
-                issue.setFixVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
-                if ( date.isEqual( LocalDate.parse( issue.getResolutionDate() ) ) || date.isAfter( LocalDate.parse(issue.getResolutionDate()) ) ){
+            for(LocalDate date : version_map.keySet()){
+                issue.setFixVersion(Integer.parseInt(Iterables.getLast(version_map.get(date))));
+                if (date.isEqual(LocalDate.parse(issue.getResolutionDate())) || date.isAfter(LocalDate.parse(issue.getResolutionDate())) ){
                     break;
                 }
             }
 
             // Opening Version
-            for( LocalDate date : version_map.keySet()){
-                issue.setOpeningVersion(Integer.parseInt( Iterables.getLast( version_map.get(date) )));
-                if ( date.isEqual( LocalDate.parse( issue.getCreationDate() ) ) || date.isAfter( LocalDate.parse(issue.getCreationDate()) ) ){
+            for(LocalDate date : version_map.keySet()){
+                issue.setOpeningVersion(Integer.parseInt(Iterables.getLast(version_map.get(date))));
+                if (date.isEqual(LocalDate.parse(issue.getCreationDate())) || date.isAfter(LocalDate.parse(issue.getCreationDate()))){
                     break;
                 }
             }
@@ -201,8 +201,8 @@ public class RetrieveTicketsID {
             Va ad impostare le affected versions come indice per ogni issue che abbia l'informazione indicata in Jira.
             Vengono inoltre popolate due liste separate di issue che hanno e non hanno delle AV indicate.
         */
-        for ( Issue issue : list_of_issues ){
-            if ( issue.getAffectedVersion().isEmpty() ){
+        for (Issue issue : list_of_issues){
+            if (issue.getAffectedVersion().isEmpty()){
                 list_of_issues_without_AV.add( issue );
             }
             else{
@@ -213,15 +213,15 @@ public class RetrieveTicketsID {
 
                 // Controlliamo che la affected version sia coerente, ovvero che non sia >= della fix version
                 avs.removeIf( av -> av >= issue.getFixVersion());
-                if ( avs.isEmpty() ) {
+                if (avs.isEmpty()) {
                     list_of_issues_without_AV.add( issue );
                 }
                 else{
                     // Se quindi sopravvive al controllo di cui sopra andiamo ad aggiungere l'issue alla lista di quelle
                     // che hanno una AV oltre ad assegnarla all'oggetto issue
-                    int minValue = Collections.min( avs );
-                    int maxValue = ( issue.getFixVersion() - 1 );
-                    avs = new ArrayList<>( IntStream.rangeClosed(minValue, maxValue).boxed().collect(Collectors.toList()) );
+                    int minValue = Collections.min(avs);
+                    int maxValue = (issue.getFixVersion() - 1);
+                    avs = new ArrayList<>(IntStream.rangeClosed(minValue, maxValue).boxed().collect(Collectors.toList()));
                     issue.setAffectedVersionIndex(avs);
                     list_of_issues_with_AV.add( issue );
                 }

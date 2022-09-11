@@ -34,12 +34,12 @@ public class DatasetBuilder {
     }
 
     /*  Metodo utilizzato per popolare @fileDataset  */
-    public void populateFileDataset( List<Issue> issues ){
-
+    public void populateFileDataset(List<Issue> issues){
 
         // Costruisce una lista con i filename collegati ai vari commit relativi alle issues
         ArrayList<String> fileNameList = (ArrayList<String>) buildFilenameList(issues);
 
+        // Itero sui commits relativi alle issue, contenenti
         for ( Issue issue : issues ){
             for ( CommitDetails commit : issue.getCommits() ) {
                 if (commit.getFilesChanged() != null) {
@@ -49,8 +49,6 @@ public class DatasetBuilder {
         }
 
         setFileDataset(fileNameList);
-
-
     }
 
     /* Questo metodo si occupa di scrivere il CSV che rappresenta il dataset */
@@ -164,7 +162,7 @@ public class DatasetBuilder {
     public void setFileDataset(List<String> fileNameList){
         int limit = 14;
         for (int versionFile=0; versionFile <= limit; versionFile++){
-            for (String entry: fileNameList ){
+            for (String entry: fileNameList){
                 if (!fileDataset.containsKey(versionFile, entry)) {
                     Metric newMetric = new Metric();
                     newMetric.setVersion(versionFile);
