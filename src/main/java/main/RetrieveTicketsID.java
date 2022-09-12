@@ -34,7 +34,6 @@ public class RetrieveTicketsID {
     private static final List<Issue> list_of_issues_with_AV = new ArrayList<>();
     private static final List<Issue> list_of_issues_without_AV = new ArrayList<>();
 
-    private static double p;
     public static final String RELEASE_DATE = "releaseDate";
 
     private static DatasetBuilder datasetBuilder;
@@ -240,22 +239,24 @@ public class RetrieveTicketsID {
         }
     }
 
-    public static void computeProportionIncremental(List<Issue> issues){
+    public static int computeProportionIncremental(List<Issue> issues, int fixedVersionNoAV){
         /*
             Effettua il calcolo della proportion, nello specifico andando ad indicare P come la media delle
             versioni precedenti considerando le issue che hanno le affected e le injection version.
         */
-        ArrayList<Double> proportions = new ArrayList<>();
-        for (Issue issue : issues){
+        List<Issue> previousIssues = issues.stream()
+                .filter(issue -> issue.getFixVersion() <= fixedVersionNoAV).toList();
+        ArrayList<Double> arrayProportion = new ArrayList<>();
+        for (Issue issue : previousIssues){
             if (issue.getOpeningVersion() != issue.getFixVersion()) {
                 double fv = issue.getFixVersion();
                 double ov = issue.getOpeningVersion();
                 double iv = issue.getInjectedVersion();
                 double p = (fv - iv)/(fv - ov);
-                proportions.add( p );
+                arrayProportion.add( p );
             }
         }
-        p = average( proportions );
+        return (int) average( arrayProportion );
     }
 
     public static void setAffectedAndInjectedVersionsP(List<Issue> issues){
@@ -263,11 +264,11 @@ public class RetrieveTicketsID {
             Andiamo ad assegnare la affected e la injected version stimata sfruttando il valore di P precedentemente
             calcolato su tutte le issue di cui avevamo le affected version.
         */
-        for ( Issue issue : issues ){
+        for (Issue issue : issues){
             int fv = issue.getFixVersion();
             int ov = issue.getOpeningVersion();
-            int pInt = (int) p;
-            issue.setInjectedVersion(fv - ((fv - ov) * pInt));
+            int p = computeProportionIncremental(list_of_issues_with_AV, fv);
+            issue.setInjectedVersion(fv - ((fv - ov) * p));
 
             int minAVValue = issue.getInjectedVersion();
             int maxAVValue = issue.getFixVersion() - 1;
@@ -323,8 +324,6 @@ public class RetrieveTicketsID {
             setAffectedVersionsAV();
 
             setInjectedVersionAV();
-
-            computeProportionIncremental(list_of_issues_with_AV);
 
             setAffectedAndInjectedVersionsP(list_of_issues_without_AV);
 
