@@ -239,7 +239,7 @@ public class RetrieveTicketsID {
         }
     }
 
-    public static int computeProportionIncremental(List<Issue> issues, int fixedVersionNoAV){
+    public static double computeProportionIncremental(List<Issue> issues, int fixedVersionNoAV){
         /*
             Effettua il calcolo della proportion, nello specifico andando ad indicare P come la media delle
             versioni precedenti considerando le issue che hanno le affected e le injection version.
@@ -256,7 +256,7 @@ public class RetrieveTicketsID {
                 arrayProportion.add( p );
             }
         }
-        return (int) average( arrayProportion );
+        return average( arrayProportion );
     }
 
     public static void setAffectedAndInjectedVersionsP(List<Issue> issues){
@@ -267,8 +267,9 @@ public class RetrieveTicketsID {
         for (Issue issue : issues){
             int fv = issue.getFixVersion();
             int ov = issue.getOpeningVersion();
-            int p = computeProportionIncremental(list_of_issues_with_AV, fv);
-            issue.setInjectedVersion(fv - ((fv - ov) * p));
+            double p = computeProportionIncremental(list_of_issues_with_AV, fv);
+
+            issue.setInjectedVersion((int)(fv - ((fv - ov) * p)));
 
             int minAVValue = issue.getInjectedVersion();
             int maxAVValue = issue.getFixVersion() - 1;
